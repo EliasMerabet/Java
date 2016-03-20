@@ -1,0 +1,44 @@
+CONTROLLER.
+
+    public ModelAndView subir(HttpServletRequest hsr, HttpServletResponse hsr1) throws Exception {
+
+        Map model = new HashMap();
+        model.put("accion", "inicio");
+        ModelAndView mv = new ModelAndView("redirect:altaSocio.htm", model);
+
+        String nombreArchivo = hsr.getParameter("usuarioRD");
+        nombreArchivo += ".jpg";
+
+        //Carpeta local donde se guardaran los ficheros subidos
+        String carpetaArchivos = "images/dni/";
+
+        //Recuperar ruta real (dentro del servidor de aplicaciones)
+        //donde se encuentra la carpeta imagenes de muestra
+        //aplicacion
+        String pathCarpetaArchivos = this.getClass().getResource("/").getPath();
+        pathCarpetaArchivos = pathCarpetaArchivos.substring(0, pathCarpetaArchivos.length() - 27);
+        pathCarpetaArchivos = pathCarpetaArchivos.substring(1);
+        pathCarpetaArchivos += "/web/" + carpetaArchivos;
+
+        Part filePart = hsr.getPart("f_socio"); // Retrieves <input type="file" name="file">
+        FileOutputStream destino;
+        try (FileInputStream fileContent = (FileInputStream) filePart.getInputStream()) {
+            File f = new File(pathCarpetaArchivos, nombreArchivo);
+            destino = new FileOutputStream(f);
+            byte[] tamBuffer = new byte[1024];
+            int len;
+            while ((len = fileContent.read(tamBuffer)) > 0) {
+                destino.write(tamBuffer, 0, len);
+            }
+            destino.close();
+            mv.addObject("subido", "Fichero subido correctamente");
+        } catch (IOException ex) {
+            model = new HashMap();
+            model.put("accion", "alta");
+            mv.addObject("usuarioRD", nombreArchivo);
+            mv.addObject("subido", "Error al subir el fichero, por favor... intentelo de nuevo...");
+            return mv;
+        }
+
+        return mv;
+    }
