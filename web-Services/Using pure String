@@ -1,0 +1,38 @@
+CONTROLLER.
+
+    @WebMethod(operationName = "busquedaPeliculas")
+    public String busquedaPeliculas(@WebParam(name = "consulta") String consulta) {
+        String pelis = "";
+        Statement st;
+        ResultSet rs;
+        try {
+            conectar();
+            st = cn.createStatement();
+            rs = st.executeQuery(consulta);
+            while (rs.next()) {
+                pelis += Integer.toString(rs.getInt(1)) + "#" + rs.getString(2) + "#" + rs.getString(3) + "#" + rs.getString(4)
+                        + "#" + Integer.toString(rs.getInt(5)) + "#" + rs.getString(6) + "\'";
+
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(InfoPeliculas.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return pelis;
+    }
+
+    @WebMethod(operationName = "numeroRegistros")
+    public int numeroRegistros(@WebParam(name = "consulta") String consulta) {
+        Statement st;
+        ResultSet rs;
+        int numeroregistros = 0;
+        try {
+            conectar();
+            st = cn.createStatement();
+            rs = st.executeQuery(consulta);
+            rs.next();
+            numeroregistros = rs.getInt(1);
+        } catch (SQLException ex) {
+            Logger.getLogger(InfoPeliculas.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return numeroregistros;
+    }
