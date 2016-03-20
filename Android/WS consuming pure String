@@ -1,0 +1,113 @@
+package android.gestionvideoclub;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.StrictMode;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.ScrollView;
+import android.widget.TextView;
+
+import org.ksoap2.SoapEnvelope;
+import org.ksoap2.SoapFault;
+import org.ksoap2.serialization.PropertyInfo;
+import org.ksoap2.serialization.SoapObject;
+import org.ksoap2.serialization.SoapPrimitive;
+import org.ksoap2.serialization.SoapSerializationEnvelope;
+import org.ksoap2.transport.HttpTransportSE;
+import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.IOException;
+import java.util.ArrayList;
+
+public class Cartelera extends AppCompatActivity {
+
+    static final String SOAPACTION = "http://WebServicesInfoPeliculas/busquedaPeliculas";
+    private static final String METHOD = "busquedaPeliculas";
+    private static final String NAMESPACE = "http://WebServicesInfoPeliculas/";
+    private static final String URL = "http://192.168.0.156:8084/GestionVideoclub1/InfoPeliculas?wsdl";
+    ListView cartelera;
+    private String consulta = "select codigo_pelicula, ruta_logo, titulo, genero, duracion, sinopsis " +
+            "from GERENTE.cartelera order by titulo";
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_cartelera);
+
+        if (android.os.Build.VERSION.SDK_INT > 9) {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+        }
+
+        this.cartelera = (ListView) findViewById(R.id.listView2);
+
+
+
+        String c = mostrarCartelera();
+        String[] peliculas = c.split("\'");
+        String[] informacion;
+        String[] esteban = new String[peliculas.length];
+
+        for (int i = 0; i < peliculas.length; i++) {
+            informacion = peliculas[i].split("#");
+            String dur = informacion[4];
+            String rut = informacion[1];
+            String tit = informacion[2];
+            String gen = informacion[3];
+            String sin = informacion[5];
+            esteban[i] = "TITULO: " + tit + "\nGENERO: " + gen  + "\nDURACION: " + dur + "\n";
+        }
+
+        ArrayAdapter<String> adaptador = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, esteban);
+
+        this.cartelera.setAdapter(adaptador);
+
+    }
+
+    public String mostrarCartelera(){
+
+            //Creacion de la Solicitud
+            SoapObject request = new SoapObject(NAMESPACE, METHOD);
+            //Creacion del Envelope
+            SoapSerializationEnvelope sobre = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            sobre.setOutputSoapObject(request);
+            //Creacion del transporte
+            HttpTransportSE transporte = new HttpTransportSE(URL);
+
+            // Paso de parámetro
+            PropertyInfo consulta = new PropertyInfo();
+            consulta.setName("consulta");
+            consulta.setValue(this.consulta);
+            consulta.setType(String.class);
+            request.addProperty(consulta);
+
+            //Llamada
+
+        try {
+            transporte.call(SOAPACTION, sobre);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (XmlPullParserException e) {
+            e.printStackTrace();
+        }
+
+        //Resultado
+        SoapPrimitive resultado = null;
+        try {
+            resultado = (SoapPrimitive) sobre.getResponse();
+        } catch (SoapFault soapFault) {
+            soapFault.printStackTrace();
+        }
+        String cartelera = resultado.toString();
+
+        return cartelera;
+
+    }
+
+}
