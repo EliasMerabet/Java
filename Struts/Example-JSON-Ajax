@@ -1,0 +1,311 @@
+VIEW
+
+<%@page contentType="text/html"%>
+<%@ taglib uri="http://struts.apache.org/tags-tiles" prefix="tiles" %>
+
+<tiles:insert page="/plantillaGerente.jsp" flush="true" >
+    	<tiles:put name="tituloPag" value="Portada Gerente" />
+        <tiles:put name="tituloPag1" value="/tiles/portadaGerentetituloPagina1.jsp" />
+	<tiles:put name="cuerpo" value="/tiles/actualizarDatosGCuerpo.jsp" />
+</tiles:insert>
+
+
+<%@ taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
+<%@ taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
+<%@ taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
+<%@ taglib uri="http://struts.apache.org/tags-tiles" prefix="tiles" %>
+
+<script type="text/javascript" src="js/jquery-2.1.4.min.js"></script>
+<script type="text/javascript">
+    function ajax() {
+        $.ajax({
+            url: 'http://localhost:8084/GestionVideoclub1/ControladorActualizarG.do', //controlador al que llamas
+            type: 'post', //si es get o post
+            data: $("#formulario").serialize() + '&opcion=actualizar', //lo que envías al controlador, el .serialize es para enviar los campos de un formulario completo como ya conocemos &variable=valor&variable2=valor2 etc.
+
+            success: function (gerente) {
+                var datosResp = "";
+
+                datosResp += "Telefono: <input type='text' name='telefono' style='width: 70px;margin-left: 75px;box-shadow: 10px 10px 5px #808080;' value='" + gerente.tel + "'/><br>";
+                datosResp += "Usuario: <input type='text' name='user' style='width: 70px;margin-left: 77px;box-shadow: 10px 10px 5px #808080;' value='" + gerente.user + "'/><br>";
+                datosResp += "Password: <input type='password' name='pass' style='width: 70px;margin-left: 64px;box-shadow: 10px 10px 5px #808080;' value='" + gerente.pass + "'/><br><br>";
+                datosResp += "<input type='button' value='Actualizar' onclick='ajax();' style='box-shadow: 10px 10px 5px #808080;'/>";
+                $("#datos").html(datosResp);
+            }
+        });
+    }
+</script>
+
+<h3 class="p1">Informacion Gerente</h3>
+<div class="div-tabla" style="box-shadow: 10px 10px 5px #808080;">
+
+    <logic:present name="gerente">
+
+        Nombre: <input type='text' name='nom' style='width: 70px;margin-left: 78px;box-shadow: 10px 10px 5px #808080;' value='<bean:write name="gerente" property="nom"/>' disabled/><br>
+        Apellido: <input type='text' name='ape' style='width: 70px;margin-left: 77px;box-shadow: 10px 10px 5px #808080;' value='<bean:write name="gerente" property="ape"/>' disabled/><br>
+
+        <form id="formulario">
+            <div id="datos" name="datos">
+                Telefono: <input type='text' name='telefono' style='width: 70px;margin-left: 75px;box-shadow: 10px 10px 5px #808080;' value='<bean:write name="gerente" property="tel"/>'/><br>
+                Usuario: <input type='text' name='user' style='width: 70px;margin-left: 77px;box-shadow: 10px 10px 5px #808080;' value='<bean:write name="gerente" property="user"/>'/><br>
+                Password: <input type='password' name='pass' style='width: 70px;margin-left: 64px;box-shadow: 10px 10px 5px #808080;' value='<bean:write name="gerente" property="pass"/>'/><br><br>
+
+                <input type="button" value="Actualizar" onclick="ajax();" style="box-shadow: 10px 10px 5px #808080;"/>
+            </div>
+        </form><br>
+
+
+        <input type="button" value="Volver" onclick="window.history.back();" style="box-shadow: 10px 10px 5px #808080;"/>
+
+    </logic:present>
+
+</div>
+
+
+MODEL.
+
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package modeloStruts;
+
+import controladorStruts.Gerente;
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.struts.action.ActionErrors;
+import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
+
+/**
+ *
+ * @author Kenzo
+ */
+public class ModeloActualizarG extends org.apache.struts.action.ActionForm {
+
+    private int cod;
+    private String nom;
+    private String ape;
+    private int tel;
+    private String user;
+    private String pass;
+    private String actualizar;
+    private Gerente gerente;
+
+    public int getCod() {
+        return cod;
+    }
+
+    public String getNom() {
+        return nom;
+    }
+
+    public String getApe() {
+        return ape;
+    }
+
+    public int getTel() {
+        return tel;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public String getPass() {
+        return pass;
+    }
+
+    public String getActualizar() {
+        return actualizar;
+    }
+
+    public Gerente getGerente() {
+        return gerente;
+    }
+
+    public void setGerente(Gerente gerente) {
+        this.gerente = gerente;
+    }
+
+    public void setActualizar(String actualizar) {
+        this.actualizar = actualizar;
+    }
+
+    public void setPass(String pass) {
+        this.pass = pass;
+    }
+
+    public void setCod(int cod) {
+        this.cod = cod;
+    }
+
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
+
+    public void setApe(String ape) {
+        this.ape = ape;
+    }
+
+    public void setTel(int tel) {
+        this.tel = tel;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    /**
+     *
+     */
+    public ModeloActualizarG() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+    /**
+     * This is the action called from the Struts framework.
+     *
+     * @param mapping The ActionMapping used to select this instance.
+     * @param request The HTTP Request we are processing.
+     * @return
+     */
+    @Override
+    public ActionErrors validate(ActionMapping mapping, HttpServletRequest request) {
+
+        ActionErrors errors = new ActionErrors();
+
+        if (getUser() == null || (getUser().length() < 1) && (getUser().length() > 10)) {
+            errors.add("user", new ActionMessage("login.error.user"));
+        }
+        if (getPass() == null || (getPass().length() < 4) && (getPass().length() > 10)) {
+            errors.add("pass", new ActionMessage("login.error.pass"));
+        }
+        return errors;
+    }
+}
+
+
+CONTROLLER.
+
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package controladorStruts;
+
+import com.google.gson.Gson;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+
+/**
+ *
+ * @author Kenzo
+ */
+public class ControladorActualizarG extends org.apache.struts.actions.DispatchAction {
+
+    Connection cn;
+
+    public ActionForward actualizar(ActionMapping mapping, ActionForm form,
+            HttpServletRequest request, HttpServletResponse response)
+            throws Exception {
+
+        HttpSession sesion = request.getSession(false);
+        String usuario = (String) sesion.getAttribute("user");
+
+        int tel = Integer.parseInt(request.getParameter("telefono"));
+        String usuarioN = request.getParameter("user");
+        String pas = request.getParameter("pass");
+        int conf;
+
+        conectar();
+
+        //NO LLAMO A PRIVATE PROCEDURE PORQUE NO QUIERO PASAR TANTOS PARAMETROS. O LA PETICION.
+        CallableStatement cs;
+        cs = cn.prepareCall("{call GERENTE.FGerentes.actualizarG(?,?,?,?,?)}");
+        cs.setString(1, usuario);
+        cs.setInt(2, tel);
+        cs.setString(3, usuarioN);
+        cs.setString(4, pas);
+        cs.registerOutParameter(5, java.sql.Types.INTEGER);
+        cs.execute();
+
+        conf = cs.getInt(5);
+
+        if (conf == 2) {
+            sesion = request.getSession();
+            sesion.setAttribute("user", usuarioN);
+        }
+
+        String consulta = "select g.codigo_gerente, g.nombre, g.apellido, g.telefono, u.pass, u.usuario from GERENTE.gerentes g "
+                + "inner join GERENTE.usuarios u on g.usuario = '" + usuarioN + "' and u.usuario = '" + usuarioN + "'";
+
+        Gerente gerente = this.obtenerGerente(consulta);
+
+        cs.close();
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        String json = new Gson().toJson(gerente);
+        response.getWriter().write(json);
+        return null;
+
+    }
+
+    private Gerente obtenerGerente(String consulta) {
+
+        Gerente gerente = new Gerente();
+
+        try {
+
+            conectar();
+
+            Statement st = cn.createStatement();
+            ResultSet rs = st.executeQuery(consulta);
+
+            if (rs.next()) {
+                gerente.setCod(rs.getInt(1));
+                gerente.setNom(rs.getString(2));
+                gerente.setApe(rs.getString(3));
+                gerente.setTel(rs.getInt(4));
+                gerente.setUser(rs.getString(6));
+                gerente.setPass(rs.getString(5));
+            }
+
+            st.close();
+            rs.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(ControladorActualizarG.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return gerente;
+
+    }
+
+    private void conectar() {
+
+        try {
+            DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
+            cn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "gerente", "gerente");
+        } catch (SQLException ex) {
+            Logger.getLogger(ControladorActualizarG.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
+}
