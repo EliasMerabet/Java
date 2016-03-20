@@ -1,0 +1,30 @@
+CONTROLLER.
+
+public ModelAndView inicio(HttpServletRequest hsr, HttpServletResponse hsr1) throws Exception {
+
+        int pos = 1;
+        int numeroregistros;
+
+        if (hsr.getParameter("posicion") != null) {
+            pos = Integer.parseInt(hsr.getParameter("posicion"));
+        }
+
+        ArrayList<Socio> socios;
+
+        String consulta = "select codigo_socio, nombre, apellido, direccion, telefono, dni, fa from "
+                + "(select s.*, rownum rnum from (select codigo_socio, nombre, apellido, direccion, telefono, "
+                + "dni, to_char(fecha_alta, 'dd-mm-yy HH24:MM:SS') as fa from GERENTE.socios order by apellido) s where rownum <" + (pos + 5) + ") "
+                + "where rnum >=" + pos;
+
+        DriverManagerDataSource dataSource;
+        dataSource = (DriverManagerDataSource) Conexion.getBean("dataSource", hsr.getServletContext());
+        this.cn = dataSource.getConnection();
+        numeroregistros = numeroRegistros();
+        socios = obtenerSocios(consulta);
+        ModelAndView mv = new ModelAndView();
+
+        mv.addObject("socios", socios);
+        mv.addObject("numeroregistros", numeroregistros);
+        mv.addObject("posicion", pos);
+        return mv;
+    }
