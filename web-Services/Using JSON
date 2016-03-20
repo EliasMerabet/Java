@@ -1,0 +1,65 @@
+CONTROLLER.
+
+    @WebMethod(operationName = "alquiladas")
+    public String alquiladas(@WebParam(name = "usuario") String usuario, @WebParam(name = "password") String password) {
+
+        int cs;
+        ArrayList<Alquilada> alquiladas = new ArrayList<>();
+
+        try {
+            PreparedStatement ps;
+            ResultSet rs;
+
+            conectar();
+
+            ps = cn.prepareStatement("select s.codigo_socio from GERENTE.socios s inner join GERENTE.usuarios u "
+                    + "on s.usuario = u.usuario where u.usuario = ? and u.pass = ?");
+            ps.setString(1, usuario);
+            ps.setString(2, password);
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+
+                cs = rs.getInt(1);
+
+                PreparedStatement ps1;
+                ResultSet rs1;
+
+                ps1 = cn.prepareStatement("select a.codigo_pelicula, a.devuelta, a.devolucion, a.titulo from "
+                        + "GERENTE.alquiladas a where a.codigo_socio = ?");
+                ps1.setInt(1, cs);
+
+                rs1 = ps1.executeQuery();
+
+                SimpleDateFormat sf = new SimpleDateFormat("dd/MM/yyyy");
+
+                while (rs1.next()) {
+                    if ((rs1.getInt(2)) == 0) {
+                        Alquilada a = new Alquilada();
+                        a.setCp(rs1.getInt(1));
+                        a.setCs(cs);
+                        a.setDevolucion(sf.format(rs1.getDate(3)));
+                        a.setDevuelta(false);
+                        a.setTitulo(rs1.getString(4));
+                        alquiladas.add(a);
+                    }
+                }
+
+            } else {
+                Alquilada a = new Alquilada();
+                a.setCp(0);
+                a.setCs(0);
+                a.setDevolucion("");
+                a.setDevuelta(false);
+                a.setTitulo("");
+                alquiladas.add(a);
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(InfoPeliculas.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        String json = new Gson().toJson(alquiladas);
+        return json;
+
+    }
