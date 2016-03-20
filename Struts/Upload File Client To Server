@@ -1,0 +1,139 @@
+CONTROLLER.
+
+package controladorStruts;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import modeloStruts.ModeloSubirFichero;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+import org.apache.struts.upload.FormFile;
+
+public class SubirFichero extends org.apache.struts.action.Action {
+
+    @Override
+    public ActionForward execute(ActionMapping mapping, ActionForm form,
+            HttpServletRequest request, HttpServletResponse response)
+            throws Exception {
+
+        //Recuperar formbean de la accion
+        ModeloSubirFichero formbean = (ModeloSubirFichero) form;
+
+        //Recuperar fichero subido
+        FormFile archivo = formbean.getArchivo();
+
+        //Recuperar el nombre del fichero
+        String nombreArchivo = request.getParameter("usuarioRD");
+        nombreArchivo += ".jpg";
+
+        //Recuperar el contenido del fichero
+        byte[] contenidoArchivo = archivo.getFileData();
+
+        //Carpeta local donde se guardaran los ficheros subidos
+        String carpetaArchivos = "images/dni/";
+
+        //Recuperar ruta real (dentro del servidor de aplicaciones)
+        //donde se encuentra la carpeta imagenes de muestra
+        //aplicacion
+        
+        String pathCarpetaArchivos = this.getClass().getResource("/").getPath();
+        pathCarpetaArchivos = pathCarpetaArchivos.substring(0, pathCarpetaArchivos.length()-27);
+        pathCarpetaArchivos = pathCarpetaArchivos.substring(1);
+        pathCarpetaArchivos += "/web/" + carpetaArchivos;
+
+        //Crear objeto File asociado a la carpeta
+        File carpeta = new File(pathCarpetaArchivos);
+
+        //Comprobar si existe o no
+        if (!carpeta.exists()) {
+            //No existe. La creamos en el servidor
+            carpeta.mkdirs();
+        }
+
+        //Crear objeto File asociado con el nombre del fichero
+        //dentro de la carpeta anterior
+        File fichero = new File(carpeta, nombreArchivo);
+
+        //Declarar flujo de escritura en bytes cuyo destino es
+        //fichero
+        FileOutputStream fos = null;
+
+        try {
+            //Crear flujo escritura
+            fos = new FileOutputStream(fichero);
+
+            //Escribir contenido del fichero en el flujo
+            fos.write(contenidoArchivo);
+        } finally {
+            //Comprobar si se ha creado el flujo
+            if (fos != null) {
+                //Cerrar y enviar contenido al fichero
+                fos.close();
+            }
+        }
+
+        request.setAttribute("subido", "Dni subido correctamente al servidor...");
+        return mapping.findForward("altaEmpleado");
+    }
+}
+
+
+MODELO.
+
+package modeloStruts;
+
+import javax.servlet.http.HttpServletRequest;
+import org.apache.struts.Globals;
+import org.apache.struts.action.ActionErrors;
+import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
+import org.apache.struts.upload.FormFile;
+
+public class ModeloSubirFichero extends org.apache.struts.action.ActionForm {
+
+    /*
+     * Propiedad de tipo org.apache.struts.upload.FormFile con
+     * el fichero que se subirá a la aplicación
+     */
+    private FormFile archivo;
+    
+    public FormFile getArchivo() {
+        return archivo;
+    }
+
+    public void setArchivo(FormFile archivo) {
+        this.archivo = archivo;
+    }
+
+    @Override
+    public ActionErrors validate(ActionMapping mapping, HttpServletRequest request) {
+        ActionErrors errores = new ActionErrors();
+
+        //Recuperar en bytes el tamaño del fichero subido
+        int tamañoBytes = archivo.getFileSize();
+
+        //Comprobar el tamaño
+        if (tamañoBytes == 0) {
+            //No se ha seleccionado ningún fichero
+            errores.add(Globals.MESSAGE_KEY, new ActionMessage("errors.file"));
+        } else if (tamañoBytes > 2 * 1024 * 1024) {
+            //Excede de los 2 Mb
+            errores.add(Globals.MESSAGE_KEY, new ActionMessage("errors.size"));
+        } else {
+            //Tamaño correcto.
+            //Recuperamos el nombre del fichero en minusculas
+            String nombreArchivo = archivo.getFileName().toLowerCase();
+
+            //Comprobar extension
+            if (!nombreArchivo.endsWith(".jpg")) {
+                //Formato no permitido
+                errores.add(Globals.MESSAGE_KEY,new ActionMessage("errors.type"));
+            }
+        }
+
+        return errores;
+    }
+}
