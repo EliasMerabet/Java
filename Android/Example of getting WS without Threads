@@ -1,0 +1,119 @@
+package android.gestionvideoclub;
+
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.StrictMode;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
+
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import org.ksoap2.SoapEnvelope;
+import org.ksoap2.SoapFault;
+import org.ksoap2.serialization.PropertyInfo;
+import org.ksoap2.serialization.SoapObject;
+import org.ksoap2.serialization.SoapPrimitive;
+import org.ksoap2.serialization.SoapSerializationEnvelope;
+import org.ksoap2.transport.HttpTransportSE;
+import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+
+public class LoginAlquiladas extends AppCompatActivity {
+
+    static final String SOAPACTION = "http://WebServicesInfoPeliculas/alquiladas";
+    private static final String METHOD = "alquiladas";
+    private static final String NAMESPACE = "http://WebServicesInfoPeliculas/";
+    private static final String URL = "http://192.168.0.156:8084/GestionVideoclub1/InfoPeliculas?wsdl";
+    EditText usuario, password;
+    TextView error;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_login_alquiladas);
+
+        if (Build.VERSION.SDK_INT > 9) {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+        }
+
+        this.usuario = (EditText) findViewById(R.id.editText);
+        this.password = (EditText) findViewById(R.id.editText2);
+        this.error = (TextView) findViewById(R.id.error);
+    }
+
+    public void mostrarAlquiladas(View v) {
+
+        if ((this.usuario.getText().toString().length() < 4) || (this.usuario.getText().toString().length() > 10)) {
+            this.error.setText("Formato de usuario incorrecto");
+        } else if (this.password.getText().toString().length() < 1) {
+            this.error.setText("Formato de password incorrecto");
+        } else {
+            //Creacion de la Solicitud
+            SoapObject request = new SoapObject(NAMESPACE, METHOD);
+            //Creacion del Envelope
+            SoapSerializationEnvelope sobre = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            sobre.setOutputSoapObject(request);
+            //Creacion del transporte
+            HttpTransportSE transporte = new HttpTransportSE(URL);
+
+            // Paso de parámetro
+            PropertyInfo usuario = new PropertyInfo();
+            usuario.setName("usuario");
+            usuario.setValue(this.usuario.getText().toString());
+            usuario.setType(String.class);
+            request.addProperty(usuario);
+
+            PropertyInfo password = new PropertyInfo();
+            password.setName("password");
+            password.setValue(this.password.getText().toString());
+            password.setType(String.class);
+            request.addProperty(password);
+
+            //Llamada
+
+            try {
+                transporte.call(SOAPACTION, sobre);
+            } catch (IOException e) {
+                this.error.setText("Se ha producido un error accediendo al servicio");
+            } catch (XmlPullParserException e) {
+                this.error.setText("Se ha producido un error accediendo al servicio");
+            }
+
+            //Resultado
+            SoapPrimitive resultado = null;
+            try {
+                resultado = (SoapPrimitive) sobre.getResponse();
+            } catch (SoapFault soapFault) {
+                this.error.setText("Se ha producido un error accediendo al servicio");
+            }
+
+            String alquiladas = resultado.toString();
+
+            if (alquiladas == null) {
+                this.error.setText("Error al acceder a Alquiladas.");
+            } else {
+                Intent i = new Intent(this, Alquiladas.class);
+                i.putExtra("alquiladas", alquiladas);
+                startActivity(i);
+            }
+
+        }
+    }
+
+}
