@@ -76,7 +76,7 @@ public class LoginAlquiladas extends AppCompatActivity {
             PropertyInfo usuario = new PropertyInfo();
             usuario.setName("usuario");
             usuario.setValue(this.usuario.getText().toString());
-            usuario.setType(String.class);
+            usuario.setType(String.class); 
             request.addProperty(usuario);
 
             PropertyInfo password = new PropertyInfo();
