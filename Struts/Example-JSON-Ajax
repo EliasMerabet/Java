@@ -49,7 +49,7 @@ VIEW
                 Telefono: <input type='text' name='telefono' style='width: 70px;margin-left: 75px;box-shadow: 10px 10px 5px #808080;' value='<bean:write name="gerente" property="tel"/>'/><br>
                 Usuario: <input type='text' name='user' style='width: 70px;margin-left: 77px;box-shadow: 10px 10px 5px #808080;' value='<bean:write name="gerente" property="user"/>'/><br>
                 Password: <input type='password' name='pass' style='width: 70px;margin-left: 64px;box-shadow: 10px 10px 5px #808080;' value='<bean:write name="gerente" property="pass"/>'/><br><br>
-
+                
                 <input type="button" value="Actualizar" onclick="ajax();" style="box-shadow: 10px 10px 5px #808080;"/>
             </div>
         </form><br>
