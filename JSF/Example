@@ -224,7 +224,7 @@ public class BeanverAlquiladas {
             cn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "socio", "socio");
         } catch (SQLException ex) {
             Logger.getLogger(BeanverAlquiladas.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        } 
 
     }
 
