@@ -1,0 +1,23 @@
+CONTROLLER.
+
+private void meterCookies(HttpServletRequest request, String usuario, String password, HttpServletResponse response) {
+
+        Cookie[] galletas = request.getCookies();
+        boolean nuevo = true;
+
+        if (galletas != null) {
+            for (Cookie galleta : galletas) {
+                if (galleta.getName().equals(usuario) && galleta.getValue().equals(password)) {
+                    nuevo = false;
+                    break;
+                }
+            }
+        }
+        if (nuevo) {
+            response.setContentType("text/html");
+            Cookie galleta = new Cookie(usuario, password);
+            galleta.setMaxAge(300000);
+            response.addCookie(galleta);
+        }
+
+    }
