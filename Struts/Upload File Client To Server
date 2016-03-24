@@ -73,7 +73,7 @@ public class SubirFichero extends org.apache.struts.action.Action {
                 //Cerrar y enviar contenido al fichero
                 fos.close();
             }
-        }
+        } 
 
         request.setAttribute("subido", "Dni subido correctamente al servidor...");
         return mapping.findForward("altaEmpleado");
