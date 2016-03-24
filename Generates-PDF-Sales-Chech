@@ -1,0 +1,146 @@
+private void mostrarFactura() {
+
+        try {
+            Font fonts = new Font(Font.HELVETICA, 10, Font.ITALIC);
+            Font fonts1 = new Font(Font.HELVETICA, 15, Font.ITALIC);
+            DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+            Date fechaactual = new Date();
+
+            Socios s = obtenerDatosSocio();
+
+            Image headerImage;
+
+            headerImage = Image.getInstance("E:\\WorkSpaces\\Java\\NetBeans\\GestionVideoclubDEFINITIVO\\web\\images\\factura.jpg");
+
+            Document document = new Document();
+            ByteArrayOutputStream salida = new ByteArrayOutputStream();
+            PdfWriter.getInstance(document, salida);
+
+            document.open();
+            document.add(new Paragraph(" "));
+            document.add(new Paragraph(" "));
+            document.add(new Phrase(new Chunk(headerImage, 350, 0)));
+            PdfPTable table = new PdfPTable(3);
+            PdfPCell cell = new PdfPCell(new Paragraph("GESTION VIDEOCLUB", fonts1));
+            cell.setColspan(3);
+            table.addCell(cell);
+
+            cell = new PdfPCell(new Paragraph(""));
+            cell.setColspan(3);
+            table.addCell(cell);
+
+            cell = new PdfPCell(new Paragraph("FACTURA:" + df.format(fechaactual), fonts1));
+            cell.setHorizontalAlignment(1);
+            cell.setColspan(3);
+            table.addCell(cell);
+
+            cell = new PdfPCell(new Paragraph(""));
+            cell.setColspan(3);
+            table.addCell(cell);
+
+            table.addCell("NOMBRE: " + s.getNombre());
+            cell = new PdfPCell(new Paragraph("APELLIDO: " + s.getApellido()));
+            cell.setColspan(2);
+            table.addCell(cell);
+
+            table.addCell("DNI: " + s.getDni());
+            cell = new PdfPCell(new Paragraph("DIRECCION: " + s.getDireccion()));
+            cell.setColspan(2);
+            table.addCell(cell);
+
+            cell = new PdfPCell(new Paragraph(""));
+            cell.setColspan(3);
+            table.addCell(cell);
+            cell = new PdfPCell(new Paragraph(""));
+            cell.setColspan(3);
+            table.addCell(cell);
+
+            cell = new PdfPCell(new Paragraph("CONCEPTO", fonts1));
+            cell.setColspan(3);
+            table.addCell(cell);
+
+            cell = new PdfPCell(new Paragraph(""));
+            table.addCell(cell);
+            cell = new PdfPCell(new Paragraph(""));
+            cell.setColspan(3);
+            table.addCell(cell);
+
+            cell = new PdfPCell(new Paragraph("PRODUCTOS COMPRADOS", fonts));
+            cell.setColspan(3);
+            table.addCell(cell);
+
+            cell = new PdfPCell(new Paragraph(""));
+            cell.setColspan(3);
+            table.addCell(cell);
+            cell = new PdfPCell(new Paragraph(""));
+            cell.setColspan(3);
+            table.addCell(cell);
+
+            cell = new PdfPCell(new Paragraph("ALIMENTOS", fonts));
+            cell.setColspan(3);
+            table.addCell(cell);
+
+            for (AlimentoCarrito a : this.alimentos) {
+
+                cell = new PdfPCell(new Paragraph("NOMBRE: " + a.getNom(), fonts));
+                table.addCell(cell);
+                cell = new PdfPCell(new Paragraph("CANTIDAD: " + a.getCantidad(), fonts));
+                table.addCell(cell);
+                cell = new PdfPCell(new Paragraph("PRECIO: " + a.getPrecioVenta(), fonts));
+                table.addCell(cell);
+            }
+
+            cell = new PdfPCell(new Paragraph(""));
+            cell.setColspan(3);
+            table.addCell(cell);
+            cell = new PdfPCell(new Paragraph(""));
+            cell.setColspan(3);
+            table.addCell(cell);
+            cell = new PdfPCell(new Paragraph("PELICULAS", fonts));
+            cell.setColspan(3);
+            table.addCell(cell);
+
+            for (PeliculaCarrito p : this.peliculas) {
+
+                cell = new PdfPCell(new Paragraph("NOMBRE: " + p.getNom(), fonts));
+                table.addCell(cell);
+                cell = new PdfPCell(new Paragraph("CANTIDAD: " + p.getCantidad(), fonts));
+                table.addCell(cell);
+                cell = new PdfPCell(new Paragraph("PRECIO: " + p.getPrecioVenta(), fonts));
+                table.addCell(cell);
+            }
+
+            cell = new PdfPCell(new Paragraph(""));
+            cell.setColspan(3);
+            table.addCell(cell);
+            cell = new PdfPCell(new Paragraph(""));
+            cell.setColspan(3);
+            table.addCell(cell);
+            cell = new PdfPCell(new Paragraph(""));
+            cell.setColspan(3);
+            table.addCell(cell);
+            cell = new PdfPCell(new Paragraph("TOTAL: " + this.factura, fonts));
+            cell.setColspan(3);
+            table.addCell(cell);
+
+            document.add(table);
+            document.close();
+
+            HttpServletResponse response = (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
+
+            response.setHeader("Expires", "0");
+            response.setHeader("Cache-Control", "must-revalidate, post-check=0, pre-check=0");
+            response.setHeader("Pragma", "public");
+            // setting the content type
+            response.setContentType("application/pdf");
+
+            response.setContentLength(salida.size());
+
+            OutputStream out2 = response.getOutputStream();
+            salida.writeTo(out2);
+            out2.flush();
+        } catch (DocumentException | IOException ex) {
+            Logger.getLogger(BeanVerCarrito.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
