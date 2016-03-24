@@ -25,6 +25,6 @@ public ModelAndView inicio(HttpServletRequest hsr, HttpServletResponse hsr1) thr
 
         mv.addObject("socios", socios);
         mv.addObject("numeroregistros", numeroregistros);
-        mv.addObject("posicion", pos);
+        mv.addObject("posicion", pos); 
         return mv;
     }
