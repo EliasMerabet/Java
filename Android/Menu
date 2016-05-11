@@ -1,0 +1,61 @@
+// ADD TO res/menu A RESOURCE FILE (menu.xml)
+
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/menu_home"
+        android:icon="@drawable/home"
+        android:title="Home" />
+
+    <item android:id="@+id/menu_alquiler"
+        android:icon="@drawable/alquiler"
+        android:title="Alquiler" />
+
+    <item android:id="@+id/menu_venta"
+        android:icon="@drawable/venta"
+        android:title="Venta" />
+
+    <item android:id="@+id/menu_nosotros"
+        android:icon="@drawable/nosotros"
+        android:title="Donde Estamos" />
+</menu>
+
+// IN EACH ACTIVITY CALL THE MENU.
+
+@Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.menu, menu);
+        return true;
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case R.id.menu_home:
+                // Single menu item is selected do something
+                // Ex: launching new activity/screen or show alert message
+                Toast.makeText(Home.this, "Estas en el Home", Toast.LENGTH_SHORT).show();
+                return true;
+
+            case R.id.menu_alquiler:
+                Intent i = new Intent(this, Alquiler.class);
+                startActivity(i);
+                return true;
+
+            case R.id.menu_venta:
+                Intent ii = new Intent(this, Venta.class);
+                startActivity(ii);
+                return true;
+
+            case R.id.menu_nosotros:
+                Intent iii = new Intent(this, Nosotros.class);
+                startActivity(iii);
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
