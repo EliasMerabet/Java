@@ -1,0 +1,18 @@
+                            <html:form action="/ControladorPortadaGerente.do?opcion=ver" method="post">
+                                <html:submit value="Ver Datos" style="box-shadow: 10px 10px 5px #808080;"/>
+                            </html:form><br>
+                            <html:form action="/ControladorPortadaGerente.do?opcion=actualizar" method="post">
+                                <html:submit value="Actualizar Datos" style="box-shadow: 10px 10px 5px #808080;"/>
+                            </html:form><br>
+                            <html:form action="/ControladorPortadaGerente.do?opcion=deslogarse" method="post">
+                                <html:submit value="Deslogarse" style="box-shadow: 10px 10px 5px #808080;"/>
+                            </html:form>
+
+STRUTS-CONFIG.
+        <action path="/ControladorPortadaGerente" type="controladorStruts.ControladorPortadaGerente" name="ModeloPortadaGerente"
+                scope="session" validate="true" input="/portadaGerente.jsp" parameter="opcion"/>
+                
+        <form-bean name="ModeloPortadaGerente" type="org.apache.struts.action.DynaActionForm">
+            <form-property name="opcion" type="java.lang.String"/>
+            <form-property name="gerente" type="controladorStruts.Gerente"/>
+        </form-bean>
