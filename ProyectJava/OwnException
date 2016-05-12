@@ -1,0 +1,32 @@
+package videoclub.excepciones;
+
+//Creo una clase excepcion que extienda de la interfaz Exception, para tratar
+//una parada del flujo del programa concreta.
+/**
+ * Esta clase manejara una excepcion relacionada con el numero de socios
+ * creados.
+ * 
+ * @author Elias Merabet
+ *
+ */
+public class NoPuedeSerException extends Exception {
+	/**
+	 * Es una clase serializable, por tanto y al extender de Exception, debemos
+	 * darle un valor por defecto para la version. Necesario porque al ser una
+	 * clase transmitible pueden darse problemas por el uso de diferentes
+	 * versiones.
+	 */
+	private static final long serialVersionUID = 8118946720599789179L;
+
+	/**
+	 * Constructor de la excepcion, le pasamos un mensaje con el que llamara al
+	 * superconstructor.
+	 * 
+	 * @param mensaje
+	 *            informacion sobre el evento dado.
+	 */
+	public NoPuedeSerException(String mensaje) {
+		super("Enhorabuena!! Es usted el cliente numero 5!! " + mensaje);
+	}
+
+}
