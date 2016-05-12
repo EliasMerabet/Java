@@ -1,0 +1,39 @@
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        try {
+            HttpSession sesion = request.getSession(false);
+            int ns = Integer.parseInt((String)sesion.getAttribute("NSS"));
+           
+            DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
+            Connection conn1 = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "system", "javaoracle");
+            
+            response.setContentType("text/html");
+            PrintWriter out = response.getWriter();
+            
+            CallableStatement cs = conn1.prepareCall("{call ingresarPaciente(?,?,?,?,?,?,?)}");
+            
+            cs.setInt(1, Integer.parseInt(request.getParameter("textIns")));
+            cs.setString(2, request.getParameter("textApe"));
+            cs.setString(3, request.getParameter("textDir"));
+            cs.setString(4, request.getParameter("textFN"));
+            cs.setString(5, request.getParameter("textSex"));
+            cs.setInt(6, ns);
+            cs.registerOutParameter(7, java.sql.Types.INTEGER);
+            cs.execute();
+            
+            int n = cs.getInt(7);
+            
+            if (n == 0){
+                out.println("<html>\n<head>\n\n<title>Servlet Entrada Salida Estructurado</title>\n"
+                + "<meta charset='UTF-8'>\n<meta charset='UTF-8'>\n"
+                + "<meta name='viewport' content='width=device-width, initial-scale=1.0'>\n</head>\n"
+                + "<center><h1><strong> ALTA CORRECTA </strong></h1></center>");
+            } else{
+            out.println("<html>\n<head>\n\n<title>Servlet Entrada Salida Estructurado</title>\n"
+                + "<meta charset='UTF-8'>\n<meta charset='UTF-8'>\n"
+                + "<meta name='viewport' content='width=device-width, initial-scale=1.0'>\n</head>\n"
+                + "<center><h1><strong> ALTA NO CORRECTA </strong></h1></center>");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Servlet2.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
