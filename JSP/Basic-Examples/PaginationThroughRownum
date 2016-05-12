@@ -1,0 +1,65 @@
+<%@page import="java.sql.ResultSet"%>
+<%@page import="java.sql.Statement"%>
+<%@page import="java.sql.Connection"%>
+<%@page import="java.sql.DriverManager"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+
+<!DOCTYPE html>
+<html>
+    
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>JSP Page</title>
+    </head>
+    
+    <body>
+        
+        <%
+        int posicion;
+        String consulta;
+        int numeroregistros;
+        
+        if (request.getParameter("posicion") != null){
+            posicion = Integer.parseInt(request.getParameter("posicion"));
+        }else{
+            posicion = 1;
+        }
+        
+        try{
+        DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
+        Connection con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "system", "javaoracle");
+        Statement st = con.createStatement();
+        consulta = "select apellido, oficio, fecha_alt, salario from (select e.*, rownum rnum from (select apellido,"
+                + " oficio, fecha_alt, salario from emp order by apellido) e where rownum < " + (posicion+3) + ") "
+                + "where rnum >= " + (posicion);
+        ResultSet rset = st.executeQuery(consulta);
+        Statement st2 = con.createStatement();
+        ResultSet rset2 = st2.executeQuery("select count(*) from emp");
+        rset2.next();
+        numeroregistros = rset2.getInt(1);
+        rset2.close();
+        String tabla = "<table border = '1'><th>Apellido</th><th>Oficio</th><th>Fecha Alta</th><th>Salario</th>";
+        
+        while(rset.next()){
+            tabla += "<tr><td>" + rset.getString(1) + "</td><td>" + rset.getString(2) + "</td>"
+                    + "<td>" + rset.getString(3) + "</td><td>" + rset.getString(4) + "</td>";
+        }
+        tabla += "</table>";
+        if ( (posicion >= 3) && (posicion <= numeroregistros-3) ){
+            tabla +="<a href='conjuntoEmpleados.jsp?posicion="+ (posicion-3)  + "'>anterior</a>&nbsp;";
+            tabla +="<a href='conjuntoEmpleados.jsp?posicion="+ (posicion+3) + "'>siguiente</a>&nbsp;";
+        }else if( (posicion >= 0) && (posicion <= 2) ){
+            tabla +="<a href='conjuntoEmpleados.jsp?posicion="+ (posicion+3) + "'>siguiente</a>&nbsp;";
+        }else if ( (posicion >= numeroregistros-2) && (posicion <= numeroregistros) ){
+            tabla +="<a href='conjuntoEmpleados.jsp?posicion="+ (posicion-3)  + "'>anterior</a>&nbsp;";
+        }
+        %>
+        
+        <%=tabla%>
+        <% }catch(Exception ex){%>
+        <h1>ERROR <%=ex.toString()%></h1>
+        <%}%>
+        
+    </body>
+    
+</html>
