@@ -1,0 +1,150 @@
+VIEW.
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+
+<%@taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
+<%@taglib prefix="f" uri="http://java.sun.com/jsf/core" %>
+
+<!DOCTYPE html>
+<f:view>
+    <html>
+
+        <head>
+            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+            <title>JSP Page</title>
+        </head>
+
+        <body>
+
+            <h:dataTable value="#{tabla}" var="fila">
+                <h:column>
+                    <h:outputText value="#{fila.nom}" /> 
+                </h:column>
+                <h:column>
+                    <f:facet name="header">
+                        NUMERO
+                    </f:facet>
+                    <h:outputText value="#{fila.num}" /> 
+                </h:column>
+                <h:column>
+                    <f:facet name="header">
+                        LOCALIDAD
+                    </f:facet>
+                    <h:outputText value="#{fila.loc}" />
+                </h:column>
+            </h:dataTable>
+
+        </body>
+    </html>
+</f:view>
+
+CONTROLLER.
+package controlador;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+
+/**
+ *
+ * @author alumno
+ */
+public class Departamento extends org.apache.struts.action.Action {
+
+    Connection cn;
+    
+    @Override
+    public ActionForward execute(ActionMapping mapping, ActionForm form,
+            HttpServletRequest request, HttpServletResponse response)
+            throws Exception {
+        
+        ArrayList<DepartamentoClase> departamentos = new ArrayList<DepartamentoClase>();
+        
+        Statement st;
+        ResultSet rs;
+        
+
+        try {
+            DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
+            cn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "system", "javaoracle");
+        } catch (SQLException ex) {
+            Logger.getLogger(DepartamentoClase.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        
+        st = cn.createStatement();
+        rs = st.executeQuery("select * from GERENTE.alimentos");
+        
+        while (rs.next()){
+            DepartamentoClase dept = new DepartamentoClase();
+            dept.setNum(rs.getInt(1));
+            dept.setNom(rs.getString(2));
+            dept.setLoc(rs.getString(3));
+            departamentos.add(dept);
+        }
+        
+        request.setAttribute("tabla", departamentos);
+        return mapping.findForward("departamentos");
+    }
+}
+
+MODEL.
+package controlador;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+/**
+ *
+ * @author alumno
+ */
+public class DepartamentoClase {
+    
+    private int num;
+    private String nom;
+    private String loc;
+
+    public int getNum() {
+        return num;
+    }
+
+    public String getNom() {
+        return nom;
+    }
+
+    public String getLoc() {
+        return loc;
+    }
+
+    public void setNum(int num) {
+        this.num = num;
+    }
+
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
+
+    public void setLoc(String loc) {
+        this.loc = loc;
+    }
+    
+}
+
+STRUS-CONFIG.
+        <action path="/departamentos" type="controlador.Departamento">
+            <forward name="departamentos" path="/departamentos.jsp" />
+        </action>
+        
