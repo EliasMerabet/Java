@@ -1,0 +1,116 @@
+VIEW (Search).
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
+<%@ taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
+<%@ taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>JSP Page</title>
+        <link rel="stylesheet" type="text/css" href="newcss.css"/>   
+    </head>
+
+    <body>
+        <html:form action="/EmpleadoAction">
+            <table border="1">
+                <tr>
+                    <th>Introduzca un ID de empleado</th>
+                    <td><html:text property="empno"/></td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <html:submit value="Buscar Empleado"/>
+                    </td>
+                </tr>
+                <tr>
+                    <logic:present name="existe">
+                        <bean:write name="existe"/>
+                    </logic:present>
+                </tr>
+            </table>
+        </html:form>
+    </body>
+
+</html>
+
+VIEW (Result).
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
+<%@ taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
+<%@ taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>JSP Page</title>
+    </head>
+    <body>
+        <span style="color: blue; font-size: large">
+            <bean:write name="existe" />
+        </span>
+    </body>
+
+
+</html>
+
+CONTROLLER.
+package controlador;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.DynaActionForm;
+
+/**
+ *
+ * @author alumno
+ */
+public class EmpleadoAction extends org.apache.struts.action.Action {
+
+    /* forward name="success" path="" */
+    private static final String SUCCESS = "success";
+
+    /**
+     * This is the action called from the Struts framework.
+     *
+     * @param mapping The ActionMapping used to select this instance.
+     * @param form The optional ActionForm bean for this request.
+     * @param request The HTTP Request we are processing.
+     * @param response The HTTP Response we are processing.
+     * @throws java.lang.Exception
+     * @return
+     */
+    @Override
+    public ActionForward execute(ActionMapping mapping, ActionForm form,
+            HttpServletRequest request, HttpServletResponse response)
+            throws Exception {
+        
+        DynaActionForm formulario = (DynaActionForm) form;
+        int emp = Integer.parseInt(formulario.get("empno").toString());
+
+        DriverManager.registerDriver(new oracle.jdbc.OracleDriver());
+        Connection cn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE", "system", "javaoracle");
+        PreparedStatement pst = cn.prepareStatement("SELECT APELLIDO FROM EMP WHERE EMP_NO=?");
+        pst.setInt(1, emp);
+        ResultSet rs = pst.executeQuery();
+        String dato;
+        if (rs.next() == true) {
+            dato = "El empleado encontrado es " + rs.getString("APELLIDO");
+            request.setAttribute("existe", dato);
+            return mapping.findForward("datosempleado");
+        } else {
+            dato = "Empleado no encontrado";
+            request.setAttribute("existe", dato);
+            return mapping.getInputForward();
+        }
+    }
+}
