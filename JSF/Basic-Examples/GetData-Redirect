@@ -1,0 +1,96 @@
+VIEW.
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html">
+    <h:head>
+        <title>Pagina de inicio</title>
+        <link rel="stylesheet" href="newcss.css"/>
+    </h:head>
+    <h:body>
+        <h:form id="form1">
+            <table border="1">
+                <tr>
+                    <th>Usuario</th>
+                    <td>
+                        <h:inputText binding="#{LoginBean.txtusuario}" id="txtusuario"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Password</th>
+                    <td>
+                        <h:inputSecret binding="#{LoginBean.txtpassword}" id="txtpassword"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <h:commandButton id="btnvalidarusuario" value="Validar Usuario" action="#{LoginBean.btnvalidarusuario_click}"/>                        
+                    </td>
+                </tr>
+            </table>
+        </h:form>
+    </h:body>
+</html>
+
+CONTROLLER.
+package pqmanagedbeans;
+
+/**
+ *
+ * @author alumno
+ */
+import javax.faces.component.html.*;
+
+public class LoginBean {
+
+    private HtmlInputText txtusuario;
+    private HtmlInputSecret txtpassword;
+
+    public String btnvalidarusuario_click() {
+        String usuario = this.txtusuario.getValue().toString();
+        String password = this.txtpassword.getValue().toString();
+
+        if (usuario.equalsIgnoreCase("programador")
+                && password.equalsIgnoreCase("java")) {
+            return "correcto";
+        } else {
+            return "incorrecto";
+        }
+    }
+
+    public HtmlInputText getTxtusuario() {
+        return txtusuario;
+    }
+
+    public void setTxtusuario(HtmlInputText txtusuario) {
+        this.txtusuario = txtusuario;
+    }
+
+    public HtmlInputSecret getTxtpassword() {
+        return txtpassword;
+    }
+
+    public void setTxtpassword(HtmlInputSecret txtpassword) {
+        this.txtpassword = txtpassword;
+    }
+}
+
+FACES-CONFIG.
+    <navigation-rule>
+        <from-view-id>/index.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>correcto</from-outcome>
+            <to-view-id>/usuariocorrecto.xhtml</to-view-id>
+        </navigation-case>
+        <navigation-case>
+            <from-outcome>incorrecto</from-outcome>
+            <to-view-id>/sinacceso.xhtml</to-view-id>
+        </navigation-case>
+    </navigation-rule>
+    <navigation-rule>
+        <from-view-id>/sinacceso.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>volver</from-outcome>
+            <to-view-id>/index.xhtml</to-view-id>
+        </navigation-case>
+    </navigation-rule>
