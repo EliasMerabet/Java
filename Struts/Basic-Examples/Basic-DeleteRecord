@@ -1,0 +1,154 @@
+VIEW.
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
+<%@ taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
+<%@ taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
+<html:html lang="true"/>
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>JSP Page</title>
+    </head>
+
+    <body>
+        
+        <bean:message key="app.peque"></bean:message>
+        <img src="<bean:message key='app.bandera'/>" width="20" height="20" ><br><br>
+        
+        <html:form action="borrar" method="post">
+            <div>
+                <bean:message key="form.apellido" />*<html:text property="apellido" size="20" />&nbsp;nbsp;nbsp;
+                <html:errors property="apellido" />
+            </div><br>
+
+            <html:submit>
+                <bean:message key="form.boton" />
+            </html:submit>
+            
+        </html:form>
+    </body>
+
+</html>
+
+MODEL.
+package modelo;
+
+import java.io.UnsupportedEncodingException;
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.struts.action.ActionErrors;
+import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
+
+/**
+ *
+ * @author alumno
+ */
+public class Modelo extends org.apache.struts.action.ActionForm {
+    
+    private String apellido;
+
+    /**
+     * @return
+     */
+    public String getApellido() {
+        return apellido;
+    }
+
+    /**
+     * @param string
+     * @throws java.io.UnsupportedEncodingException
+     */
+    public void setApellido(String string) throws UnsupportedEncodingException {
+        String ape = new String(string.getBytes("ISO-8859-1"),"UTF-8");
+        apellido = ape;
+    }
+
+    /**
+     *
+     */
+    public Modelo() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+    /**
+     * This is the action called from the Struts framework.
+     *
+     * @param mapping The ActionMapping used to select this instance.
+     * @param request The HTTP Request we are processing.
+     * @return
+     */
+    public ActionErrors validate(ActionMapping mapping, HttpServletRequest request) {
+        ActionErrors errors = new ActionErrors();
+        if (getApellido() == null || getApellido().length() < 1) {
+            errors.add("apellido", new ActionMessage("error.apellido.requerido"));
+            // TODO: add 'error.name.required' key to your resources
+        }
+        return errors;
+    }
+}
+
+CONTROLLER.
+package Controlador;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import modelo.Modelo;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+
+/**
+ *
+ * @author alumno
+ */
+public class controlador extends org.apache.struts.action.Action {
+
+    /* forward name="success" path="" */
+    private static final String SUCCESS = "success";
+    private static Connection cn;
+    private static PreparedStatement ps;
+
+    /**
+     * This is the action called from the Struts framework.
+     *
+     * @param mapping The ActionMapping used to select this instance.
+     * @param form The optional ActionForm bean for this request.
+     * @param request The HTTP Request we are processing.
+     * @param response The HTTP Response we are processing.
+     * @throws java.lang.Exception
+     * @return
+     */
+    @Override
+    public ActionForward execute(ActionMapping mapping, ActionForm form,
+            HttpServletRequest request, HttpServletResponse response)
+            throws Exception {
+        int af = 0;
+        try {
+            DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
+            cn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "system", "javaoracle");
+
+            ps = cn.prepareStatement("delete from emp where apellido = ?");
+            ps.setString(1, ((Modelo) form).getApellido());
+
+            af = ps.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+        } finally {
+            cn.close();
+        }
+
+        if (af > 0) {
+            return mapping.findForward("ok");
+        } else {
+            return mapping.findForward("error");
+        }
+    }
+}
