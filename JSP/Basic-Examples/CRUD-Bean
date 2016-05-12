@@ -1,0 +1,146 @@
+VIEW (Update).
+<%@page import="java.sql.ResultSet"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+    
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>JSP Page</title>
+        <jsp:useBean id="objeto" scope="session" class="BeansPropios.Bean2"/>
+    </head>
+    
+    <body>
+        <div style="display: inline-block">
+        <h1>OPCIONES</h1><br><br>
+        <a href='doctores.jsp?opcion=alta'>Alta</a><br>
+        <a href='doctores.jsp?opcion=baja'>Baja</a><br>
+        <a href='doctores.jsp?opcion=modificar'>Modificar</a><br>
+        <a href='doctores.jsp?opcion=ver'>Ver</a><br>
+        </div>
+        
+        <div style="display: inline-block">
+            <%
+              String html = "";
+                
+                String cons = "update doctor set especialidad = '" + request.getParameter("esp") + "' where doctor_no = '" 
+                           + request.getParameter("combo") +"'";
+                objeto.modificar(cons);
+              
+              if (request.getParameter("opcion") == null){
+              
+              } else if (request.getParameter("opcion").equals("alta")){
+                html += "<h1>ALTA</h1><br><br>\n<form action='alta.jsp'><h2>Nuevo doctor</h2><br>\nApellido<input type='text' name='ape'/><br>\n"
+                        + "Especialidad<input type='text' name='esp'/><br>\nSalario<input type='text' name='sal'/>" +
+                        "<input type='submit'></form><br>\n";
+            %>
+            <%
+
+                }else if (request.getParameter("opcion").equals("baja")){
+                html += "<h1>BAJA</h1><br><br>\n<<h2>bAJA doctor</h2><br>\nCodigo de Doctor<input type='text' name='c_d'/><br>\n";
+            %>
+
+            <%
+                }else if(request.getParameter("opcion").equals("ver")){
+                    ResultSet rs1 = objeto.ver();
+                    html += objeto.pintarTabla(rs1);
+            %>
+
+            <%
+                } else if (request.getParameter("opcion").equals("modificar")){
+                   String combo = "<select name='combo'>";
+                   String combo1 = "<select name='combo1'>";
+                   
+                    html += "<form action='modificar.jsp'><h1>MODIFICAR</h1><br><br>\n<<h2>Modificar doctor</h2><br>\n"
+                        + objeto.pintarCombo("doctor_no", combo) + "Nueva Especialidad<input type='text' name='esp'/><br>\n"
+                        + objeto.pintarCombo("especialidad", combo1) + "<input type='submit'/></form>";
+                    
+                }  
+            %>
+        </div>
+        <%=html%>
+        
+    </body>
+    
+</html>
+
+BEAN.
+package BeansPropios;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+/*
+•	Crear métodos que llamen a procedimientos almacenados en la base de datos para realizar el alta, baja y modificación.
+•	Método para ver todos los datos de los doctores en una tabla.
+•	Cargar información en combos.*/
+
+/**
+ *
+ * @author alumno
+ */
+public class Bean2 {
+   
+    private Connection cn;
+    private Statement st;
+    
+    public void conectar() throws SQLException{
+            DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
+            cn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "system", "javaoracle");
+    }
+    
+    public void desconectar() throws SQLException{
+        cn.close();
+        st.close();
+    }
+    
+    public void altaBaja(String consulta) throws SQLException{
+        conectar();
+        st = cn.createStatement();
+        st.executeUpdate(consulta);
+    }
+    
+    public ResultSet ver() throws SQLException{
+        conectar();
+        st = cn.createStatement();
+        ResultSet rs = st.executeQuery("select hospital_cod, apellido, especialidad from doctor");
+        return rs;
+    }
+    
+    public String pintarTabla(ResultSet rs) throws SQLException{
+        String tabla = "<h1>VER</h1><table border='1'><tr><td>Hospital_cod</td><td>Apellido</td><td>Especialidad</td></tr>";
+        
+        while (rs.next()){
+            tabla += "<tr><td>" + rs.getInt(1) + "</td><td>" + rs.getString(2) + "</td><td>" + rs.getString(3) + "</td></tr>";
+        }
+        
+        tabla += "</table>\n";
+        return tabla;
+    }
+    
+    public String pintarCombo(String campo, String combo) throws SQLException{
+        conectar();
+        st= cn.createStatement();
+        
+        ResultSet rs = st.executeQuery("select " + campo + " from doctor");
+        
+        while (rs.next()){
+            combo += "<option value='" + rs.getString(1) + "'/>" + rs.getString(1) + "<br>\n";
+        }
+        combo += "</select><br>\n";
+        return combo;
+    }
+    
+    public void modificar(String consulta) throws SQLException{
+        conectar();
+        Statement st = cn.createStatement();
+        st.executeQuery(consulta);
+    }
+    
+}
