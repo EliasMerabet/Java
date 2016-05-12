@@ -1,0 +1,11 @@
+DISPATCHER-SERVLET.
+<bean id="urlMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+        <property name="mappings">
+            <props>
+                <prop key="index.htm">indexController</prop>
+                <prop key="ControladorDept.htm">controladorDept</prop>
+                <prop key="ver.htm">controladorPeliculas</prop>
+                <prop key="peliculas.htm">controlPeli</prop>
+            </props>
+        </property>
+    </bean>
