@@ -1,0 +1,83 @@
+TEMPLATE.
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://struts.apache.org/tags-tiles" prefix="tiles" %>
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title><tiles:getAsString name="tituloPag" /></title>
+    </head>
+
+    <body>
+        <aside style="width: 20%;float: left; height: 500px;">
+            <a href="protos.jsp">Protos</a><br>
+            <a href="vegaSicilia.jsp">Vega Sicilia</a><br
+            <a href="arzuaga.jsp">Arzuaga</a><br>
+            <a href="pradoRey.jsp">Prado Rey</a><br>
+            <a href="palacioGrajal.jsp">Palacio de Grajal</a><br>
+            <a href="senorioNava.jsp">Señorio de Nava</a><br>
+        </aside>
+        <aside style="width: 78%;float:right;height: 500px">
+            <tiles:insert attribute="cuerpo"/>
+        </aside>
+    </body><br><br><br>
+
+    <footer>
+        <img src="" style="height: 70px; width: 200px; margin-left: 40px;"/>
+        <h5>Nuestros Vinos. Conoce sus caracteristicas.</h5>
+    </footer>
+</html>
+
+HOMETILES.
+<table cellpadding="2" style="border-collapse: collapse; border: 1px solid black;" width="100%" id="AutoNumber2">
+<tr>
+<td width="100%"><i><b><font size="6" color="#0000FF">Home</font></b></i><p>
+	Aquí va a ir el cuerpo de la nueva home
+</td>
+</tr>
+</table>
+
+PORTADATILES.
+<h1><strong>Bienvenido a la vinoteca de la ribera del duero</strong></h1>
+<p>dfgsdfasdasdasdasdasdasdasdasdasdas
+asdasdasdasdasdasdasdasd457asdasdasdasdasd
+asdasdddddddddsssssssfdfsdsssssssssssssssss
+ssssssssssssssssssss664556sssssssssssssss
+654666666666666666666666666666666666666
+sssssssssssssssss6sssss7846765sssssssssssss
+ssssssssssssssssssssssssssssssssssssss
+ssssssssssssssssssssssssssssssssssss</p>
+<img src="" style="width: 200px; height: 80px;"/>
+
+PROTOSTILESCUERPO.
+<h1><strong>PROTOS CRIANZA</strong></h1>
+<p>dfgsdfasdasdasdasdasdasdasdasdasdas
+asdasdasdasdasdasdasdasdasdasdasdasdasd
+asdasdddddddddsssssssssssssssssssssss
+sssssssssssssssssssssssssssssssssss
+ssssssssssssssssssssssssssssssssssss
+sssssssssssssssssssssssssssssssssss
+ssssssssssssssssssssssssssssssssssssss
+ssssssssssssssssssssssssssssssssssss</p>
+<img src="" style="width: 200px; height: 80px;"/>
+
+VIEW (Portada).
+<%@page contentType="text/html"%>
+
+<%@ taglib uri="http://struts.apache.org/tags-tiles" prefix="tiles" %>
+
+<tiles:insert page="/plantillaVinos.jsp" flush="true" >
+	<tiles:put name="tituloPag" value="Web de Vinos" />
+	<tiles:put name="cuerpo" value="tiles/portadatiles.jsp" />
+</tiles:insert>
+
+VIEW (Protos).
+<%@page contentType="text/html"%>
+
+<%@ taglib uri="http://struts.apache.org/tags-tiles" prefix="tiles" %>
+
+<tiles:insert page="/plantillaVinos.jsp" flush="true" >
+	<tiles:put name="tituloPag" value="Web de Vinos" />
+	<tiles:put name="cuerpo" value="/tiles/protostilescuerpo.jsp" />
+</tiles:insert>
