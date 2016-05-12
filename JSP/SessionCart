@@ -1,0 +1,86 @@
+<%@page import="java.sql.DriverManager"%>
+<%@page import="java.sql.ResultSet"%>
+<%@page import="java.sql.Statement"%>
+<%@page import="java.sql.Connection"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>JSP Page</title>
+        <link rel="stylesheet" href="css/estilo.css" type="text/css" media="screen">
+    </head>
+
+    <body>
+        <form name="form-pedido" action="verCarrito.jsp?pedido=1" method="post">
+            <input type="submit" value="REALIZAR PEDIDO"/><span> CODIGO DE CLIENTE: <input type="text" name="cClient"/></span><br><br>
+            <table class="tabla">
+                <th>ID</th>
+                <th>DESCRIPCION</th>
+                <th>AÑO</th>
+                <th>PRECIO</th>
+                <th>UNIDADES</th>
+                    <%
+                        Connection cn;
+                        Statement st,st1;
+                        ResultSet rs;
+
+                        HttpSession sesion = request.getSession(false);
+                        int[] compra = (int[]) sesion.getAttribute("compra");
+
+                        /*
+                         HttpSession sesion = request.getSession();
+                         sesion.setAttribute("compra", compra);*/
+                        DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
+                        cn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "system", "javaoracle");
+
+                        st = cn.createStatement();
+                        rs = st.executeQuery("select id, descripcion, año, precio from monedas");
+
+                        if (compra != null) {
+                            while (rs.next()) {
+                                int id = rs.getInt(1);
+                                String des = rs.getString(2);
+                                int pre = rs.getInt(4);
+                                int ano = rs.getInt(3);
+                                for (int i = 0; i < compra.length; i++) {
+                                    if ((compra[i] == id)) {
+                    %>
+                <tr>
+                    <td><%=id%></td>
+                    <td><%=des%></td>
+                    <td><%=ano%></td>
+                    <td><%=pre%></td>
+                    <td><input type="number" min="1" max="9" value="1"/></td>
+                </tr>
+                <%
+                                }
+                            }
+                        }
+                    }
+
+                    if (Integer.parseInt(request.getParameter("pedido")) == 1) {
+                        if (compra != null) {
+                            rs.first();
+                            while (rs.next()) {
+                                int id = rs.getInt(1);
+                                for (int i = 0; i < compra.length; i++) {
+                                    if ((compra[i] == id)) {
+                                        String consulta = "insert into pedidos values(" + Integer.parseInt(request.getParameter("cClient")) +","+id+"," + 
+                                                Integer.parseInt(request.getParameter("cantidad")) + ")";
+                                        st1 = cn.createStatement();
+                                        int afectados = st1.executeUpdate(consulta);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                %>
+
+            </table>
+        </form>
+    </body>
+
+</html>
