@@ -1,0 +1,275 @@
+VIEW.
+<%@page contentType="text/html"%>
+<%@page pageEncoding="UTF-8"%>
+
+<%@ taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
+<%@ taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
+<%@ taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
+
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>JSP Page</title>
+    </head>
+    <body bgcolor="#81BEF7">
+       <html:form action="Tienda">
+            
+  <div style="left: 210px; top: 10px; font-size: 24px;
+       font-weight: bold; position: absolute">
+   <bean:message key="literal.bienvenida" />
+  </div>
+  <div style="left: 250px; top: 40px; font-size: 10px; position: absolute">
+   *<bean:message key="literal.mensajeEnvios" />
+  </div> 
+
+  <div style="left: 28px; top: 80px; position: absolute">
+   <bean:message key="literal.nombre" />*
+  </div>
+  <div style="left: 28px; top: 100px; position: absolute">
+   <html:text property="nombre" size="40" /> 
+  </div> 
+  <div style="left: 28px; top: 123px; position: absolute">
+   <html:errors property="nombre" />
+  </div> 
+
+  <div style="left: 320px; top: 80px; position: absolute">
+   <bean:message key="literal.apellido" />*
+  </div> 
+  <div style="left: 320px; top: 100px; position: absolute">
+   <html:text property="apellido" size="40" />
+  </div>
+  <div style="left: 320px; top: 123px; position: absolute">
+   <html:errors property="apellido" />
+  </div> 
+  
+  <div style="left: 28px; top: 140px; position: absolute">
+   <bean:message key="literal.email" />*
+  </div> 
+  <div style="left: 28px; top: 160px; position: absolute">
+   <html:text property="email" size="40" />
+  </div> 
+  <div style="left: 28px; top: 183px; position: absolute">
+   <html:errors property="email" />
+  </div> 
+
+  <div style="left: 320px; top: 140px; position: absolute">
+   <bean:message key="literal.codigoPostal" />*
+  </div> 
+  <div style="left: 320px; top: 160px; position: absolute">
+   <html:text property="codigoPostal" size="5" />
+  </div>
+  <div style="left: 320px; top: 183px; position: absolute">
+   <html:errors property="codigoPostal" />
+  </div> 
+  <div style="left: 28px; top: 200px; position: absolute">
+   <bean:message key="literal.login" />*
+  </div> 
+  <div style="left: 28px; top: 220px; position: absolute">
+   <html:text property="login" size="40" />
+  </div>
+  <div style="left: 28px; top: 243px; position: absolute">
+   <html:errors property="login" />
+  </div> 
+  <div style="left: 28px; top: 260px; position: absolute">
+   <bean:message key="literal.password" />*
+  </div> 
+  <div style="left: 28px; top: 280px; position: absolute">
+  <html:password property="password1" size="40" />
+  </div>
+  <div style="left: 28px; top: 303px; position: absolute">
+   <html:errors property="password1" />
+  </div> 
+
+  <div style="left: 320px; top: 260px; position: absolute">
+   <bean:message key="literal.confirmarPassword" />*
+  </div> 
+  <div style="left: 320px; top: 280px; position: absolute">
+   <html:password property="password2" size="40" />
+  </div>
+  <div style="left: 320px; top: 303px; position: absolute">
+   <html:errors property="password2" />
+  </div>
+   <div style="left: 230px; top: 440px; position: absolute">
+   <html:reset>
+    <bean:message key="literal.restaurar" />
+   </html:reset>
+  </div> 
+  <div style="left: 320px; top: 440px; position: absolute">
+   <html:submit>
+    <bean:message key="literal.enviar" />
+   </html:submit>
+  </div> 
+</html:form>
+
+MODEL.
+package modelo;
+
+import javax.servlet.http.HttpServletRequest;
+import org.apache.struts.action.ActionErrors;
+import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
+
+public class Modelo extends org.apache.struts.action.ActionForm {
+    
+ private String nombre;
+ private String apellido;
+ private String email;
+ private String codigoPostal;
+ private String login;
+ private String password1;
+ private String password2;
+
+
+ public String getNombre() {
+  return nombre;
+ }
+
+ public void setNombre(String nombre) {
+  this.nombre = nombre;
+ }
+
+ public String getApellido() {
+  return apellido;
+ }
+
+ public void setApellido(String apellido) {
+  this.apellido = apellido;
+ }
+public String getEmail() {
+  return email;
+ }
+
+ public void setEmail(String email) {
+  this.email = email;
+ }
+
+ public String getCodigoPostal() {
+  return codigoPostal;
+ }
+
+ public void setCodigoPostal(String codigoPostal) {
+  this.codigoPostal = codigoPostal;
+ }
+
+ public String getLogin() {
+  return login;
+ }
+
+ public void setLogin(String login) {
+  this.login = login;
+ }
+
+ public String getPassword1() {
+  return password1;
+ }
+
+ public void setPassword1(String password1) {
+  this.password1 = password1;
+ }
+
+ public String getPassword2() {
+  return password2;
+ }
+
+ public void setPassword2(String password2) {
+  this.password2 = password2;
+ }
+
+  public Modelo() {
+       super();
+  }
+
+  public ActionErrors validate(ActionMapping mapping, HttpServletRequest request) {
+       ActionErrors errors = new ActionErrors();
+      if (getNombre() == null || getNombre().length() < 1) {
+   errors.add("nombre", new ActionMessage("error.nombre.requerido"));
+  }
+  if (getApellido() == null || getApellido().length() < 1) {
+   errors.add("apellido", new ActionMessage("error.apellido.requerido"));
+  }
+       
+       if (getEmail() == null || getEmail().length() < 1) {
+    errors.add("email", new ActionMessage("error.email.requerido"));
+   } else if (!email.matches(".+@.+\\.[a-z]+")) {
+    errors.add("email", new ActionMessage("error.email.incorrecto"));
+   }
+
+   if (getCodigoPostal() == null || getCodigoPostal().length() < 1) {
+    errors.add("codigoPostal", new ActionMessage("error.codigoPostal.requerido"));
+   } else if (!codigoPostal.matches("\\d{5}")) {
+    errors.add("codigoPostal", new ActionMessage("error.codigoPostal.incorrecto"));
+   }
+
+   if (getLogin() == null || getLogin().length() < 1) {
+    errors.add("login", new ActionMessage("error.login.requerido"));
+   }
+
+   if (getPassword1() == null || getPassword1().length() < 1) {
+    errors.add("password1", new ActionMessage("error.password.requerido"));
+   } else if (getPassword1().trim().length() < 8) {
+    errors.add("password1", new ActionMessage("error.password.incorrecto"));
+   }
+
+   if (getPassword2() == null || getPassword2().length() < 1) {
+    errors.add("password2", new ActionMessage("error.confirmarPassword.requerido"));
+   } else if (!getPassword1().equals(getPassword2())) {
+    errors.add("password2", new ActionMessage("error.confirmarPassword.incorrecto"));
+   } 
+       return errors;
+   }
+}
+
+
+CONTROLLER.
+package controlador;
+
+import modelo.Modelo;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.struts.action.Action;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionForward;
+import java.sql.Connection;
+import java.sql.CallableStatement;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+public class Controlador extends org.apache.struts.action.Action {
+
+    private static Connection conexion;
+    private static CallableStatement procedimiento;
+
+    private final static String SUCCESS = "success";
+
+    public ActionForward execute(ActionMapping mapping, ActionForm form,
+            HttpServletRequest request, HttpServletResponse response)
+            throws Exception {
+
+        try {
+
+            DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
+            conexion = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "system", "javaoracle");
+            procedimiento = conexion.prepareCall("{call altaUsuario(?,?,?,?,?,?)}");
+            procedimiento.setString(1, ((Modelo) form).getNombre());
+            procedimiento.setString(2, ((Modelo) form).getApellido());
+
+            procedimiento.setString(3, ((Modelo) form).getEmail());
+
+            procedimiento.setString(4, ((Modelo) form).getCodigoPostal());
+            procedimiento.setString(5, ((Modelo) form).getLogin());
+            procedimiento.setString(6, ((Modelo) form).getPassword1());
+
+            procedimiento.executeUpdate();
+
+        } catch (SQLException sqle) {
+
+            System.out.println(sqle);
+        } finally {
+            conexion.close();
+        }
+
+        return mapping.findForward("correcto");
+    }
+}
