@@ -1,0 +1,139 @@
+INTERFACE PEOPLE.
+package videoclub.persona;
+
+/**
+ * Interface Persona.
+ * 
+ * @author Elias Merabet
+ *
+ */
+public interface Persona {
+
+	// Defino en la interfaz en metodo verPersona, pero no lo implemento.
+	// Deberan hacerlo las clases que usen esta interfaz.
+	/**
+	 * Devuelve el atributo nombre.
+	 * 
+	 * @return nombre del objeto.
+	 */
+	public String getNombre();
+
+	/**
+	 * Devuelve el atributo dni.
+	 * 
+	 * @return dni del objeto.
+	 */
+	public int getDni();
+
+	/**
+	 * Devuelve la informacion del objeto en el formato requerido.
+	 * 
+	 * @return informacion del objeto.
+	 */
+	public String verPersona();
+}
+
+CLASS CLIENT.
+package videoclub.persona;
+
+import java.io.Serializable;
+import videoclub.excepciones.NoPuedeSerException;
+
+/**
+ * Clase que implementara la interface Persona.
+ * 
+ * @author Elias Merabet
+ *
+ */
+public class Cliente implements Persona, Serializable {
+
+	private static final long serialVersionUID = -4012966976013360278L;
+
+	private String nombre;
+	private int dni;
+	private int idSocio;
+	static private int nSocio = 0;
+
+	/**
+	 * Constructor que asignara dos atributos mediante los parametros que le
+	 * pasamos. Otro atributo los asignara automaticamente, en funcion de una
+	 * variable de clase. Y se encargara de generar una excepcion, si el numero
+	 * de socios creados en todo el programa supera cierto numero.
+	 * 
+	 * @param nombre
+	 *            nombre del cliente
+	 * @param dni
+	 *            dni del cliente
+	 * @throws NoPuedeSerException
+	 *             excepcion que controlara el numero de clientes creados.
+	 */
+	public Cliente(String nombre, int dni) throws NoPuedeSerException {
+		this.nombre = nombre;
+		this.dni = dni;
+		nSocio++;
+		this.idSocio = nSocio;
+		// Si se crea el cliente 5, se sale del flujo de ejecucion del programa.
+		// Se lanza una excepcion con el siguiente paso de mensaje.
+		if (idSocio == 5) {
+			throw new NoPuedeSerException("!!Cliente numero 5!!");
+		}
+	}
+
+	/**
+	 * Devuelve el atributo nombre.
+	 * 
+	 * @return String nombre nombre del objeto.
+	 */
+	public String getNombre() {
+		return nombre;
+	}
+
+	/**
+	 * Fija el atributo nombre.
+	 * 
+	 * @param nombre
+	 *            nombre del objeto.
+	 */
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+
+	/**
+	 * Devuelve el atributo dni.
+	 * 
+	 * @return int dni dni del objeto.
+	 */
+	public int getDni() {
+		return dni;
+	}
+
+	/**
+	 * Fija el atributo dni.
+	 * 
+	 * @param dni
+	 *            dni del objeto.
+	 */
+	public void setDni(int dni) {
+		this.dni = dni;
+	}
+
+	/**
+	 * Devuelve el atributo idSocio
+	 * 
+	 * @return int idSocio identificador univoco del socio.
+	 */
+	public int getIdSocio() {
+		return idSocio;
+	}
+
+	/**
+	 * Devuelve al informacion de la instancia en un String y con un formato
+	 * determinado.
+	 * 
+	 * @return String informacion del objeto desde la perspectiva persona.
+	 */
+	public String verPersona() {
+		return "El cliente " + this.nombre + ", con DNI " + this.dni + " y numero de socio " + this.idSocio + ".";
+	}
+
+}
