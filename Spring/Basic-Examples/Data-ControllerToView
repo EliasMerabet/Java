@@ -1,0 +1,109 @@
+MODEL.
+package modelos;
+
+/**
+ *
+ * @author alumno
+ */
+public class Departamento {
+    
+    private int num;
+    private String nom;
+    private String loc;
+
+    public int getNum() {
+        return num;
+    }
+
+    public String getNom() {
+        return nom;
+    }
+
+    public String getLoc() {
+        return loc;
+    }
+
+    public void setNum(int num) {
+        this.num = num;
+    }
+
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
+
+    public void setLoc(String loc) {
+        this.loc = loc;
+    }
+    
+    
+    
+}
+
+CONTROLLER.
+package controladores;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import modelos.Departamento;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.Controller;
+
+/**
+ *
+ * @author alumno
+ */
+public class DatosDeptControlador implements Controller{
+    
+    Connection cn;
+    
+        @Override
+    public ModelAndView handleRequest(HttpServletRequest hsr, HttpServletResponse hsr1) throws Exception {
+        
+        ModelAndView mv = new ModelAndView();
+        
+        List<Departamento> depts = new ArrayList<Departamento>();
+        
+        conectar();
+        
+        Statement st;
+        ResultSet rs;
+        
+        String consulta = "select dept_no, dnombre, loc from dept";
+        st = cn.createStatement();
+        rs = st.executeQuery(consulta);
+        
+        while (rs.next()){
+            Departamento departamento = new Departamento();
+            int numero = rs.getInt(1);
+            departamento.setNum(numero);
+            int numero1 = departamento.getNum();
+            departamento.setNom(rs.getString(2));
+            departamento.setLoc(rs.getString(3));
+            depts.add(departamento);  
+        }
+        
+        mv.addObject("departamentos", depts);
+        return mv;
+    }
+    
+    private void conectar(){
+        
+        try {
+            DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
+            cn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "system", "javaoracle");
+        } catch (SQLException ex) {
+            Logger.getLogger(DatosDeptControlador.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
+    
+}
