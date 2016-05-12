@@ -1,0 +1,73 @@
+CONTROLLER.
+package controladores;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import modelos.Empleado;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.Controller;
+
+/**
+ *
+ * @author alumno
+ */
+public class BuscarEmpleadoControlador implements Controller{
+    
+    Connection cn;
+    
+     @Override
+    public ModelAndView handleRequest(HttpServletRequest hsr, HttpServletResponse hsr1) throws Exception {
+        
+        ModelAndView mv = new ModelAndView();
+        
+        if (hsr.getParameter("NE") != null){
+        int numero = Integer.parseInt(hsr.getParameter("NE"));
+        Empleado emp = new Empleado();
+        
+        PreparedStatement ps;
+        ResultSet rs;
+        
+        conectar();
+        
+        ps = cn.prepareCall("select apellido, oficio, salario, comision from emp where emp_no = ?");
+        ps.setInt(1, numero);
+        rs = ps.executeQuery();
+        
+        while (rs.next()){
+            emp.setApe(rs.getString(1));
+            emp.setOfi(rs.getString(2));
+            emp.setSal(rs.getInt(3));
+            emp.setCom(rs.getInt(4));
+        }
+        
+        cn.close();
+        ps.close();
+        rs.close();
+        
+        mv.addObject("emp", emp);
+        return mv;
+        } else{
+            return mv;
+        }
+        
+    }
+    
+    private void conectar(){
+        
+        try {
+            DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
+            cn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "system", "javaoracle");
+        } catch (SQLException ex) {
+            Logger.getLogger(BuscarEmpleadoControlador.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
+    
+}
