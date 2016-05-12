@@ -1,0 +1,41 @@
+@WebServlet(urlPatterns = {"/Servlet"})
+public class Servlet extends HttpServlet {
+
+    static Cookie[] galletas;
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        boolean nuevo = true;
+        String usuario = request.getParameter("user");
+        String contra = request.getParameter("key");
+
+        //HAGO PETICION DEL ARRAY DE COOKIES Y COMPRUEBO SI USUARIO YA ENTRO.
+        galletas = request.getCookies();
+        if (galletas != null) {
+            for (int i = 0; i < galletas.length; i++) {
+                if (galletas[i].getName().equals(usuario) && galletas[i].getValue().equals(contra)) {
+                    nuevo = false;
+                    break;
+                }
+            }
+        }
+
+        PrintWriter out = response.getWriter();
+        response.setContentType("text/html");
+        Cookie galleta = new Cookie(usuario, contra);
+        galleta.setMaxAge(300000);
+        response.addCookie(galleta);
+
+        out.println("<html>");
+        out.println("<head><title>RESPUESTA</TITLE></HEAD>");
+        out.println("<BODY TEXT=#FFFFFF BGCOLOR=#000080><CENTER><H1>");
+        if (nuevo) {
+            out.println("GRACIAS POR REGISTRARSE CON NOSOTROS");
+        } else {
+            out.println("BIENVENIDO A TU SITIO FAVORITO");
+        }
+        out.println("</H1></CENTER></BODY></HTML>");
+        out.close();
+    }
+}
