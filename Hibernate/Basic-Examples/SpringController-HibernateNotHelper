@@ -1,0 +1,50 @@
+VIEW.
+<%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt"%>
+<%@ taglib prefix="sql" uri="http://java.sun.com/jstl/sql_rt"%>
+
+
+${message}
+
+<table border="1">
+
+
+<tr>
+<c:forEach var="Filas" items="${empleados}">
+<td><c:out value='${Filas.apellido}'/></a></td>
+<td><c:out value='${Filas.oficio}'/></td>
+<td><c:out value='${Filas.salario}'/></td>
+
+</tr>
+</c:forEach>
+</table>
+
+CONTROLLER.
+package controller;
+
+import model.HibernateUtil;
+import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.hibernate.Session;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.Controller;
+
+public class EmpController implements Controller {
+
+    @Override
+
+    public ModelAndView handleRequest(HttpServletRequest hsr, HttpServletResponse hsr1) throws Exception {
+
+        ModelAndView mv = new ModelAndView("empleados");
+        String out = new String("Datos de los empleados:");
+        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+        List Result = session.createQuery("from Emp as emp").list();
+        mv.addObject("empleados", Result);
+        session.getTransaction().commit();
+        mv.addObject("message", out);
+        return mv;
+
+    }
+
+}
