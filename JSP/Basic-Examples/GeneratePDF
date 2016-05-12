@@ -1,0 +1,115 @@
+<%@page import="com.lowagie.text.Chunk"%>
+<%@page import="com.lowagie.text.Anchor"%>
+<%@page import="java.text.SimpleDateFormat"%>
+<%@page import="java.text.DecimalFormat"%>
+<%@page import="java.util.Date"%>
+<%@page import="java.text.DateFormat"%>
+<%@page import="com.lowagie.text.Paragraph"%>
+<%@page import="com.lowagie.text.pdf.PdfPCell"%>
+<%@page import="com.lowagie.text.pdf.PdfPTable"%>
+<%@page import="com.lowagie.text.pdf.PdfWriter"%>
+<%@page import="java.io.ByteArrayOutputStream"%>
+<%@page import="com.lowagie.text.Document"%>
+<%@page import="com.lowagie.text.Font"%>
+<%@page import="java.sql.ResultSet"%>
+<%@page import="java.sql.PreparedStatement"%>
+<%@page import="java.sql.Connection"%>
+<%@page import="java.sql.DriverManager"%>
+<%@page import="java.sql.Driver"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+    
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>JSP Page</title>
+    </head>
+    
+    <body>
+        <%
+        DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+        Date fechaactual = new Date();
+        DecimalFormat formateado = new DecimalFormat("####.##");
+        %>
+        
+        <%
+        String apellido;
+        
+        String ape = request.getParameter("apellido");
+
+        try{
+        DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
+        Connection cn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "system", "javaoracle");
+        PreparedStatement ps = cn.prepareStatement("select oficio, fecha_alt, salario, comision from emp where apellido = ?");
+        ps.setString(1, ape);
+        ResultSet rs = ps.executeQuery();
+        rs.next();
+        String of = rs.getString(1);
+        String fa = rs.getString(2);
+        int sal = rs.getInt(3);
+        int com = rs.getInt(4);
+        
+        Font[] fonts = new Font[3];
+        fonts[0] = new Font(Font.HELVETICA, 20, Font.ITALIC);
+        fonts[1] = new Font(Font.TIMES_ROMAN, 7, Font.BOLD);
+        fonts[2] = new Font(Font.HELVETICA, 12,Font.BOLD);
+        
+        Document document = new Document();
+        ByteArrayOutputStream salida = new ByteArrayOutputStream();
+        PdfWriter.getInstance(document, salida);
+        
+        document.open();
+        PdfPTable table = new PdfPTable(2);
+        PdfPCell cell = new PdfPCell(new Paragraph("NOMINA EMPLEADO", fonts[0]));
+        cell.setHorizontalAlignment(1);
+        cell.setColspan(2);
+        table.addCell(cell);
+        
+        cell = new PdfPCell(new Paragraph("FECHA " + df.format(fechaactual), fonts[2]));
+        cell.setColspan(2);
+        table.addCell(cell);
+        
+        table.addCell("APELLIDO\n");
+        table.addCell(ape + "\n");
+        
+        table.addCell("FECHA\n");
+        table.addCell(fa + "\n");
+        
+        table.addCell("SALARIO\n");
+        table.addCell(sal + "\n");
+        
+        table.addCell("COMISION\n");
+        table.addCell(com + "\n");
+        
+        table.addCell("TOTAL\n");
+        table.addCell((sal + com) + "\n");
+        
+        document.add(table);
+        document.add(Chunk.NEWLINE);
+        document.add(new Paragraph(" "));
+        document.add(new Paragraph(" "));
+        
+        
+        Paragraph pa = new Paragraph("Ejemplar para el interesado", fonts[1]);
+        document.add(pa);
+        document.close();
+        
+        response.setHeader("Expires", "0");
+        response.setHeader("Cache-Control", "must-revalidate, post-check=0, pre-check=0");
+        response.setHeader("Pragma", "public");
+        // setting the content type
+        response.setContentType("application/pdf");
+
+        response.setContentLength(salida.size());
+
+        ServletOutputStream out2 = response.getOutputStream();
+        salida.writeTo(out2);
+        out2.flush();
+        %>
+        
+        <% }catch(Exception ex){%>
+        <h1>ERROR <%=ex.toString()%></h1>
+        <%}%>
+    </body>
+    
+</html>
