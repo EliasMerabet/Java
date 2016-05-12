@@ -1,0 +1,17 @@
+                        <%
+                            HttpSession sesion = request.getSession(false);
+
+                            String tipo = "";
+
+                            if (sesion.getAttribute("tipo_user") != null) {
+                                tipo = (String) sesion.getAttribute("tipo_user");
+                            }
+
+                            if (tipo.equals("SOCIO")) {
+                        %><jsp:forward page="accesoS.jsp"/><%
+                            } else if (tipo.equals("EMPLEADO")) {
+                        %><jsp:forward page="accesoE.jsp"/><%
+                            } else if (tipo.equals("nada")) {
+                        %><jsp:forward page="accesoNull.jsp"/><%
+                                }
+                        %>
