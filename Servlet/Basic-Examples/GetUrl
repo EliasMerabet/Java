@@ -1,0 +1,91 @@
+VIEW.
+<html>
+
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            span{
+                margin-right: 200px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div id="eleccion" style="width: 19%; display:inline-block; background-color: #ffffcc">
+            <a href="Servlet1?ANALISTA">Analistas</a>
+            <br><br>
+            <a href="Servlet1?EMPLEADO">Empleados</a>
+            <br><br>
+            <a href="Servlet1?DIRECTOR">Directores</a>
+            <br><br>
+            <a href="Servlet1?VENDEDOR">Vendedores</a>
+        </div>
+
+        <div id="resultados" style="width: 79%; display: inline-block; background-color: #00ffff; position: absolute;">
+            <header>RESULTADOS CON OFICIO EMPLEADO</header>
+            <br><br>
+            <span>Emp_no</span><span>Apellido</span><span>Dir</span><span>Dept_no</span>
+        </div>
+    </body>
+
+</html>
+
+SERVLET.
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+/**
+ *
+ * @author alumno
+ */
+@WebServlet(urlPatterns = {"/Servlet1"})
+public class Servlet1 extends HttpServlet {
+   
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        String of = request.getQueryString();
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+        
+        try {
+            DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
+            Connection conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "system", "javaoracle");
+        
+            PreparedStatement ps = conn.prepareStatement("select emp_no, apellido, dir, dept_no from emp where oficio = ?");
+            ps.setString(1, of);
+            ResultSet rs = ps.executeQuery();
+            //rs.next();
+            
+            out.println("<html>");
+            out.println("<head>");
+            out.println("<title>Respuesta Servlet</title>");
+            out.println("</head>");
+            out.println("<body bgcolor='white'>");
+            out.println("<header><center> RESULTADO CON OFICIO DE EMPLEADOS </center></header>");
+            while (rs.next()){
+            out.println("<center><p> Emp_no : " + rs.getInt(1) + "</p></center>");
+            out.println("<center><p> Apellido : " + rs.getString(2) + "</p></center>");
+            out.println("<center><p> Dir : " + rs.getInt(3) + "</p></center>");
+            out.println("<center><p> Dept_no : " + rs.getInt(4) + "</p></center>");
+            }
+            out.println("</html>");
+        } catch (SQLException ex) {
+            Logger.getLogger(Servlet1.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+    
+}
