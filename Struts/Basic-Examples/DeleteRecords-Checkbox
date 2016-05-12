@@ -1,0 +1,60 @@
+@Override
+    public ActionForward execute(ActionMapping mapping, ActionForm form,
+            HttpServletRequest request, HttpServletResponse response)
+            throws Exception {
+        
+        int sal = 0,sal1 = 0;
+
+        if (request.getParameterValues("despedidos") != null) {
+            String[] empleados = request.getParameterValues("despedidos");
+
+            int[] codigos = new int[empleados.length];
+            Statement st,st1,st2;
+            ResultSet rs;
+
+            String codigos1 = "(";
+
+            if (empleados.length == 1) {
+                codigos1 += empleados[0];
+            } else {
+                for (int i = 0; i < empleados.length - 1; i++) {
+                    codigos1 += empleados[i] + ",";
+                }
+                codigos1 += empleados[empleados.length-1];
+            }
+            
+            codigos1 += ")";
+            
+
+                  
+            conectar();
+            
+            st1 = cn.createStatement();
+            rs = st1.executeQuery("select usuario from GERENTE.empleados where codigo_empleado in " + codigos1);
+            
+            String usuarios = "(";
+            while (rs.next()){
+                usuarios += "'" + rs.getString(1) + "',";
+            }
+            
+            usuarios = usuarios.substring(0, usuarios.length()-1);
+            usuarios += ")";
+            
+            st2 = cn.createStatement();
+            sal1 = st2.executeUpdate("delete from GERENTE.usuarios where usuario in " + usuarios);   
+
+            st = cn.createStatement();
+            sal = st.executeUpdate("delete from GERENTE.empleados where codigo_empleado in " + codigos1); 
+            
+        }
+        if (sal + sal1 > 0) {
+            request.setAttribute("confirmacion", "Se han despedido los empleados indicados");
+        } else {
+            request.setAttribute("confirmacion", "Se produjo un error en el despido de los empleados");
+        }
+
+        //PARA PINTARLO DE NUEVO.
+        init(servlet, null);
+        cn.close();
+
+        return mapping.getInputForward();
