@@ -1,0 +1,92 @@
+VIEW.
+<html>
+
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+
+    <body>
+        <form name="form4" action="Servlet4" method="post">
+            <label> Dept_no: </label><input type="text" name="txtDept_no"><br><br>
+            <label> D_Nombre: </label><input type="text" name="txtD_Nombre"><br><br>
+            <label> Loc: </label><input type="text" name="txtLoc"><br><br>
+            <input type="submit" name="grabar" value="Grabar">
+        </form>
+    </body>
+
+</html>
+
+SERVLET.
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+/**
+ *
+ * @author alumno
+ */
+@WebServlet(urlPatterns = {"/Servlet4"})
+public class Servlet4 extends HttpServlet {
+    
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+        int d_no = 0;
+        
+        try{
+        d_no = Integer.parseInt(request.getParameter("txtDept_no"));
+        }catch (NumberFormatException e){
+        out.println("\"alert('No has metido un numero')\">No has metido un numero</a>");
+        return;
+        }
+        String d_n = request.getParameter("txtD_Nombre");
+        String l = request.getParameter("txtLoc");
+        
+        try {
+            DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
+            Connection conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "system", "javaoracle");
+            PreparedStatement ps = conn.prepareStatement("insert into dept values(?, ?, ?)");
+            ps.setInt(1, d_no);
+            ps.setString(2, d_n);
+            ps.setString(3, l);
+            int af = ps.executeUpdate();
+            
+            
+            
+            if (af > 0){
+                out.println("<html>");
+                out.println("<head>");
+                out.println("<title>Respuesta Servlet</title>");
+                out.println("</head>");
+                out.println("<body bgcolor='white'>");
+                out.println("<header><center> REGISTRO INTRODUCIDO CORRECTAMENTE </center></header>");
+                out.println("</html>");
+            } else{
+                out.println("<html>");
+                out.println("<head>");
+                out.println("<title>Respuesta Servlet</title>");
+                out.println("</head>");
+                out.println("<body bgcolor='white'>");
+                out.println("<header><center> PROBLEMAS AL INTRODUCIR EL REGISTRO. </center></header>");
+                out.println("</html>");
+            }
+        } catch (SQLException ex) {
+            out.println("Error al introducir registro, clave unica violada");
+            out.println("<a href=\"index4.html\">Vuelve a la pagina anterior</a>");
+            Logger.getLogger(Servlet4.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
+}
