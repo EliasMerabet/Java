@@ -1,0 +1,62 @@
+VIEW.
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html" 
+      xmlns:f="http://java.sun.com/jsf/core">
+    <link href="../css/style.css" type="text/css" rel="stylesheet" />
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        <h:form id="form1">
+            <h:dataTable headerClass="cabeceraTabla" rowClasses="fila1,fila2" styleClass="tabla" value="#{TablaDeptBean.listadepartamentos}" border="1" var="fila" id="tabladept">
+                <h:column>
+                    <f:facet name="header">
+                        NUMERO
+                    </f:facet>
+                    <h:outputText value="#{fila.numero}" /> 
+                </h:column>
+                <h:column>
+                    <f:facet name="header">
+                        NOMBRE
+                    </f:facet>
+                    <h:outputText value="#{fila.nombre}" /> 
+                </h:column>
+                <h:column>
+                    <f:facet name="header">
+                        LOCALIDAD
+                    </f:facet>
+                    <h:outputText value="#{fila.localidad}" />
+                </h:column>
+            </h:dataTable>
+            <h:outputText value="#{TablaDeptBean.mensaje}" />
+        </h:form>
+    </h:body>
+</html>
+
+CSS.
+.tabla{
+       border: solid 2px #2E2EFE ;
+       border-collapse: collapse;
+       color: #424242;
+       font-weight: bold;
+}
+
+
+ .cabeceraTabla{
+   color: #FFFFFF;
+   background: #0080FF;
+   padding:5px;
+}
+
+ .fila1{
+   text-align: center;
+   background:#FFFFFF;
+   }
+   
+.fila2{
+   text-align: center;
+   background:#EFEFFB;
+   border: solid 2px #2E2EFE;
+   }
