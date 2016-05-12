@@ -1,0 +1,93 @@
+SERVLET.
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+/**
+ *
+ * @author alumno
+ */
+@WebServlet(urlPatterns = {"/Servlet"})
+public class Servlet extends HttpServlet {
+    Connection conn = null;
+    
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        try {
+            DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
+            conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "system", "javaoracle");
+            response.setContentType("text/html");
+            PrintWriter out = response.getWriter();
+            
+            //NO LLAMO AL METODO PORQUE CONSUME MUCHO Y SE QUE NO VA A PINTAR NADA.
+            //PINTO EL CODIGO DIRECTAMENTE.
+            //String html = this.renderHTML(request);
+            //LUEGO DESDE RENDERHTML COMPROBARIA SI EL REQUEST TIENE ALGO O NO.
+            //SI NO TIENE NADA NO LLAMARIA A RECORRER EMPLEADOS.
+            String html = "<html>\n<head>\n<title>Servlet Entrada Salida Estructurado</title>\n"
+                + "<meta charset='UTF-8'>\n<meta charset='UTF-8'>\n"
+                + "<meta name='viewport' content='width=device-width, initial-scale=1.0'>\n</head>\n"
+                + "<body><form name='form' action='Servlet' method='post'>\n<h1>EMPLEADOS DEL HOSPITAL</h1>\n<select name='hospital'>\n" 
+                + recorrerHospitales() + "</select><br><br><input type='submit' value='Ver Doctores'>\n</form>\n</body>\n</html>";
+            out.println(html);
+        } catch (SQLException ex) {
+            Logger.getLogger(Servlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        try {
+            response.setContentType("text/html");
+            PrintWriter out = response.getWriter();
+            
+            String html = this.renderHTML(request);
+            out.println(html);
+        } catch (SQLException ex) {
+            Logger.getLogger(Servlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private String renderHTML(HttpServletRequest request) throws SQLException {
+        String hos = request.getParameter("hospital");
+        String html = "<html>\n<head>\n<title>Servlet Entrada Salida Estructurado</title>\n"
+                + "<meta charset='UTF-8'>\n<meta charset='UTF-8'>\n"
+                + "<meta name='viewport' content='width=device-width, initial-scale=1.0'>\n</head>\n"
+                + "<body><form name='form' action='Servlet' method='post'>\n<h1>EMPLEADOS DEL HOSPITAL</h1>\n<select name='hospital'>\n" 
+                + recorrerHospitales() + "</select>\n<br><br><input type='submit' value='Ver Doctores'>\n</form>\n</body>" + recorrerEmpleados(hos) + "\n</html>";
+        return html;
+    }
+    
+    private String recorrerEmpleados(String hospital) throws SQLException {
+        PreparedStatement ps = conn.prepareStatement("select apellido, especialidad, salario from doctor "
+                + "where hospital_cod = (select hospital_cod from hospital where nombre = ?)");
+        ps.setString(1, hospital);
+        ResultSet rset = ps.executeQuery();
+        String html1 = "";
+        while (rset.next()){
+            html1 += "<p>Apellido: " + rset.getString(1) + "</p><p>Especialidad: " 
+                    + rset.getString(2) + "</p><p>Salario: " + rset.getInt(3) + "</p>\n";
+        }
+        return html1;
+    }
+    
+    private String recorrerHospitales() throws SQLException {
+        Statement ps = conn.createStatement();
+        ResultSet rset = ps.executeQuery("select nombre from hospital");
+        String html1 = "";
+        while (rset.next()){
+            html1 += "<option value='" + rset.getString(1) + "'>" + rset.getString(1) +  "</option>\n";
+        }
+        return html1;
+    }
+}
