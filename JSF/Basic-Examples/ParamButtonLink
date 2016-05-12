@@ -1,0 +1,115 @@
+VIEW.
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core">
+    <h:head>
+        <title>Facelet Title</title>
+        <link rel="stylesheet" href="newcss.css"/>
+    </h:head>
+    <h:body>
+        <h1>Ejemplo envío parámetros JSF</h1>
+        <h:form id="form1">
+            <table border="1">
+                <tr>
+                    <td>Introduzca un numero:</td>
+                    <td><h:outputText id="txtnumero" binding="#{BeanParametros.txtnumero}"/></td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <h:commandButton id="btntabla" value="Tabla Multiplicar" action="#{BeanParametros.btnenviar_click}">
+                            <f:param name="accion" value="tabla"/>
+                        </h:commandButton>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <h:commandLink id="lnkcollatz" value="Collatz" action="#{BeanParametros.btnenviar_click}">
+                            <f:param name="accion" value="collatz"/>
+                        </h:commandLink>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <h:outputLabel id="lblresultado" binding="#{BeanParametros.lblresultado}"/>
+                    </td>
+                </tr>
+            </table>
+            <br/>
+            <br/>
+        </h:form>
+    </h:body>
+</html>
+
+CONTROLLER.
+package pqmanagedbeans;
+
+import javax.faces.component.html.*;
+import javax.faces.context.FacesContext;
+import java.util.*;
+
+public class BeanParametros {
+
+    private HtmlInputText txtnumero = new HtmlInputText();
+    private HtmlOutputLabel lblresultado = new HtmlOutputLabel();
+
+    public String btnenviar_click()
+    {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        Map parametros = facesContext.getExternalContext().getRequestParameterMap();
+        String accion = (String)parametros.get("accion");
+        int numero = Integer.parseInt(this.txtnumero.getValue().toString());
+        String resultado = "<table border='1'>";
+        resultado += "<tr><th>Resultado</th></tr>";
+        if (accion.equalsIgnoreCase("tabla"))
+        {
+            resultado += "<tr><td>Tabla Multiplicar</td></tr>";
+            for (int i = 1; i <= 10;i++)
+            {
+                resultado += "<tr>";
+                resultado += "<td>" + i + "*" + numero + "=<b>" + (numero * i) + "</b></td>";
+                resultado += "</tr>";
+            }
+        }else if (accion.equalsIgnoreCase("collatz"))
+        {
+            resultado += "<tr><td>Collatz</td></tr>";
+            while (numero != 1)
+            {
+                resultado += "<tr>";
+                if (numero%2==0)
+                {
+                    numero = numero / 2;
+                }else
+                {
+                    numero = (numero * 3) + 1;
+                }
+                resultado += "<th>" + numero + "</th>";
+                resultado += "</tr>";
+            }
+        }
+        resultado += "</table>";
+        this.lblresultado.setValue(resultado);
+        //Esta acción hace que podamos generar
+        //código HTML desde el servidor
+        //en JSF
+        this.lblresultado.setEscape(false);
+        return null;
+    }
+
+    public HtmlInputText getTxtnumero() {
+        return txtnumero;
+    }
+
+    public void setTxtnumero(HtmlInputText txtnumero) {
+        this.txtnumero = txtnumero;
+    }
+
+    public HtmlOutputLabel getLblresultado() {
+        return lblresultado;
+    }
+
+    public void setLblresultado(HtmlOutputLabel lblresultado) {
+        this.lblresultado = lblresultado;
+    }
+}
