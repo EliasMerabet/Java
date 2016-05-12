@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE struts-config PUBLIC
+          "-//Apache Software Foundation//DTD Struts Configuration 1.3//EN"
+          "http://jakarta.apache.org/struts/dtds/struts-config_1_3.dtd">
+
+
+<struts-config>
+    <form-beans>
+        
+        <form-bean name="ModeloDeslogarseG" type="org.apache.struts.action.DynaActionForm">
+        </form-bean>
+        
+        <form-bean name="ModeloPortadaGerente" type="org.apache.struts.action.DynaActionForm">
+            <form-property name="opcion" type="java.lang.String"/>
+            <form-property name="gerente" type="controladorStruts.Gerente"/>
+        </form-bean>
+        
+        <form-bean name="ModeloVerG" type="org.apache.struts.action.DynaActionForm">
+        </form-bean>
+        
+        <form-bean name="ModeloLogin" type="modeloStruts.ModeloLogin">
+            <form-property name="confirmacion" type="java.lang.String"/>
+        </form-bean>
+        
+        <form-bean name="ModeloBajaEmpleado" type="org.apache.struts.action.DynaActionForm">
+            <form-property name="empleados" type="java.util.ArrayList"/>
+        </form-bean>
+        
+        <form-bean name="ModeloActualizarG" type="modeloStruts.ModeloActualizarG">
+            <form-property name="gerente" type="controladorStruts.Gerente"/>
+            <form-property name="cod" type="java.lang.Integer"/>
+            <form-property name="nom" type="java.lang.String"/>
+            <form-property name="ape" type="java.lang.String"/>
+            <form-property name="tel" type="java.lang.Integer"/>
+            <form-property name="pass" type="java.lang.String"/>
+            <form-property name="actualizar" type="java.lang.String"/>
+            <form-property name="opcion" type="java.lang.String"/>
+        </form-bean>
+        
+        <form-bean name="ModeloAltaEmpleado" type="modeloStruts.ModeloAltaEmpleado">
+            <form-property name="confirmacion" type="java.lang.String"/>
+            <form-property name="usuarioRD" type="java.lang.String"/>
+        </form-bean>  
+        
+          <form-bean name="ModeloSubirFichero" type="modeloStruts.ModeloSubirFichero">
+              <form-property name="subido" type="java.lang.String"/>
+        </form-bean>
+          
+    </form-beans>
+    
+    <global-exceptions>
+    
+    </global-exceptions>
+
+    <global-forwards>
+        <forward name="/socio" path="/faces/portadaSocios.jsp"/>
+        <forward name="/empleado" path="/portadaEmpleados.htm?accion=inicio"/>
+        <forward name="/gerente" path="/portadaGerente.jsp"/>
+        <forward name="index" path="/index.jsp"/>
+        <forward name="actualizarDatosG" path="/actualizarDatosG.jsp"/>
+        <forward name="verDatosG" path="/verDatosG.jsp"/>
+        <forward name="accessoG" path="/accesoG.jsp"/>
+        <forward name="accesoE" path="/accesoE.jsp"/>
+        <forward name="accesoS" path="/accesoS.jsp"/>
+        <forward name="accesoNull" path="/accesoNull.jsp"/>
+        <forward name="altaEmpleado" path="/altaEmpleado.jsp"/>
+    </global-forwards>
+
+    <action-mappings>
+      
+        <action input="/altaEmpleado.jsp" name="ModeloSubirFichero" path="/SubirFichero" 
+                scope="session" validate="true" type="controladorStruts.SubirFichero"/>
+        
+        <action input="/altaEmpleado.jsp" name="ModeloAltaEmpleado" path="/ControladorAltaEmpleado" 
+                scope="session" type="controladorStruts.ControladorAltaEmpleado"/>
+        
+        <action path="/ControladorPortadaGerente" type="controladorStruts.ControladorPortadaGerente" name="ModeloPortadaGerente"
+                scope="session" validate="true" input="/portadaGerente.jsp" parameter="opcion"/>
+        
+        <action input="/actualizarDatosG.jsp" name="ModeloActualizarG" parameter="opcion" 
+                path="/ControladorActualizarG" scope="session" type="controladorStruts.ControladorActualizarG"/>
+        
+        <action path="/ControladorVerG" type="controladorStruts.ControladorVerG" name="ModeloVerG"
+                scope="session" input="/verDatosG.jsp"/>
+              
+        <action path="/ControladorDeslogarseG" type="controladorStruts.ControladorDeslogarseG" name="ModeloDeslogarseG" 
+                scope="session" validate="true" input="/portadaGerente.jsp"/>
+        
+        <action path="/ControladorBajaEmpleado" type="controladorStruts.ControladorBajaEmpleado" name="ModeloBajaEmpleado" 
+                scope="session" validate="true" input="/bajaEmpleado.jsp"/>
+        
+        <action path="/ControladorLogin" type="controladorStruts.ControladorLogin" input="/login.jsp" name="ModeloLogin" 
+                scope="session"/>
+        
+    </action-mappings>
+    
+    <controller processorClass="org.apache.struts.tiles.TilesRequestProcessor"/>
+
+    <message-resources parameter="com/myapp/struts/ApplicationResource"/>    
+    
+    <!-- ========================= Tiles plugin ===============================-->
+    <!--
+    This plugin initialize Tiles definition factory. This later can takes some
+    parameters explained here after. The plugin first read parameters from
+    web.xml, thenoverload them with parameters defined here. All parameters
+    are optional.
+    The plugin should be declared in each struts-config file.
+    - definitions-config: (optional)
+    Specify configuration file names. There can be several comma
+    separated file names (default: ?? )
+    - moduleAware: (optional - struts1.1)
+    Specify if the Tiles definition factory is module aware. If true
+    (default), there will be one factory for each Struts module.
+    If false, there will be one common factory for all module. In this
+    later case, it is still needed to declare one plugin per module.
+    The factory will be initialized with parameters found in the first
+    initialized plugin (generally the one associated with the default
+    module).
+    true : One factory per module. (default)
+    false : one single shared factory for all modules
+    - definitions-parser-validate: (optional)
+    Specify if xml parser should validate the Tiles configuration file.
+    true : validate. DTD should be specified in file header (default)
+    false : no validation
+
+    Paths found in Tiles definitions are relative to the main context.
+    -->
+    <plug-in className="org.apache.struts.tiles.TilesPlugin" >
+        <set-property property="definitions-config" value="/WEB-INF/tiles-defs.xml" />      
+        <set-property property="moduleAware" value="true" />
+    </plug-in>
+    
+    <!-- ========================= Validator plugin ================================= -->
+    <plug-in className="org.apache.struts.validator.ValidatorPlugIn">
+        <set-property
+            property="pathnames"
+            value="/WEB-INF/validator-rules.xml,/WEB-INF/validation.xml"/>
+    </plug-in>
+  
+    <plug-in className="controladorStruts.ControladorBajaEmpleado"></plug-in>
+  
+</struts-config>
