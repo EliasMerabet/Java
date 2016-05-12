@@ -1,0 +1,96 @@
+VIEW.
+<%@page import="ClasesDept.Dept"%>
+<%@page import="java.util.List"%>
+<%@page import="ClasesDept.DepartamentosHelper"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>JSP Page</title>
+    </head>
+
+    <body>
+
+        <h1>SELECCIONA EL DEPARTAMENTO A MODIFICAR E INTRODUCE EL NUEVO NOMBRE</h1>
+
+        <form action="index.jsp">
+        <%!
+            DepartamentosHelper helper = new DepartamentosHelper();
+            List departamentos = helper.getDepts();
+            int tam = departamentos.size();
+            
+            %><select name="nnum"><%
+              for (int i = 0; i < tam; i++) {
+                  Dept d = new Dept();
+                  d = (Dept) departamentos.get(i);
+                  int dnum = d.getDeptNo();
+                  String dnom = d.getDnombre();
+            %><option value="<%=dnum%>"><%=dnom%></option><%
+              }
+              %></select><br>
+        <br>Introduce el nuevo nombre: <input type="text" name="nnom"/>
+        <%
+            if ((request.getParameter("nnom") != null) && (request.getParameter("nnum") != null) ){
+            String nom = request.getParameter("nnom");
+            byte num = Byte.parseByte(request.getParameter("nnum"));
+            
+            helper.modificar(num, nom);
+        }
+        %>
+        <input type="submit"/>
+        </form>
+    </body>
+
+</html>
+
+HELPER.
+package ClasesDept;
+
+import java.util.List;
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
+import org.hibernate.Session;
+
+/**
+ *
+ * @author alumno
+ */
+public class DepartamentosHelper {
+    
+    Session session = null;
+
+    public DepartamentosHelper() {
+        this.session = HibernateUtil.getSessionFactory().getCurrentSession();
+    }
+    
+    public List getDepts(){
+        
+        List<Dept> departamentos = null;
+        try{
+        org.hibernate.Transaction tx = session.beginTransaction();
+        Query q = session.createQuery("from Dept as dept");
+        
+        departamentos = (List<Dept>) q.list();
+        } catch (HibernateException ex) {
+            System.out.println("Excepcion " + ex);
+        }
+        
+        return departamentos;   
+    }
+    
+    public void modificar(byte num, String nombre){
+        
+        Dept de = new Dept();
+            
+        org.hibernate.Transaction tx = session.beginTransaction();
+        de = (Dept) session.load(Dept.class, num);
+        
+        de.setDnombre(nombre);
+        session.update(de);
+        tx.commit();
+        
+    }
+    
+}
