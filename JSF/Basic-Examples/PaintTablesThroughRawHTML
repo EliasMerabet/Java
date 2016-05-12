@@ -1,0 +1,139 @@
+VIEW.
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core">
+
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+
+    <h:body>
+        <h:form>
+
+            <h:panelGrid columns="3">
+
+                <h:outputLabel value="Introduzca Tabla: " for="tabla"/>
+                <h:inputText id="nombre" value="#{VerTablas.nombre}"
+                             validatorMessage="El campo debe empezar por mayusculas"
+                             required="true">
+                    <f:validateRegex pattern="[A-Z]{1}[0-9a-z]{1,}"/>
+                </h:inputText>
+                <h:message for="tabla" errorStyle="color: red" infoStyle="color: green"/>  
+
+                <h:commandButton id="btntabla" value="Ver" action="#{VerTablas.btnenviar_click}"/>
+
+            </h:panelGrid>
+
+            <h:outputText binding="#{VerTablas.tablaresultado}" id="tablaresultado"/>
+        </h:form>
+    </h:body>
+
+</html>
+
+CONTROLLER.
+package pqmanagedbeans;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.faces.component.html.HtmlDataTable;
+import javax.faces.component.html.HtmlOutputText;
+
+/**
+ *
+ * @author alumno
+ */
+public class VerTablas {
+
+    private String nombre;
+    Connection cn;
+    private HtmlOutputText tablaresultado;
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public HtmlOutputText getTablaresultado() {
+        return tablaresultado;
+    }
+
+    public Connection getCn() {
+        return cn;
+    }
+
+    public void setCn(Connection cn) {
+        this.cn = cn;
+    }
+
+    public void setTablaresultado(HtmlOutputText tablaresultado) {
+        this.tablaresultado = tablaresultado;
+    }
+    
+    public String btnenviar_click() {
+
+        try {
+            String resultado = "<h1>" + this.getNombre() + "</h1><table border='1'>";
+
+            conectar();
+
+            Statement st;
+            ResultSet rs;
+            ResultSetMetaData rsmd;
+
+            String consulta = "select * from " + this.getNombre();
+            st = cn.createStatement();
+            rs = st.executeQuery(consulta);
+            rsmd = rs.getMetaData();
+
+            int ncol = rsmd.getColumnCount();
+
+            resultado += "<tr>";
+
+            for (int i = 1; i <= ncol; i++) {
+                resultado += "<th>" + rsmd.getColumnName(i) + "</th>";
+            }
+
+            resultado += "</tr>";
+
+            while (rs.next()) {
+                resultado += "<tr>";
+                for (int i = 1; i <= ncol; i++) {
+                    resultado += "<td>" + rs.getString(i) + "</td>";
+                }
+                resultado += "</tr>";
+            }
+
+            resultado += "</table>";
+            this.tablaresultado.setValue(resultado);
+            this.tablaresultado.setEscape(false);
+
+        } catch (SQLException ex) {
+            Logger.getLogger(VerTablas.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return null;
+
+    }
+
+    public void conectar() {
+        try {
+            DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
+            cn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "system", "javaoracle");
+        } catch (SQLException ex) {
+            Logger.getLogger(VerTablas.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+}
