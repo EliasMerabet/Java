@@ -1,0 +1,698 @@
+import videoclub.pelicula.*;
+
+import videoclub.persona.*;
+import videoclub.empleado.*;
+import videoclub.excepciones.NoPuedeSerException;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.time.LocalDateTime;
+
+import java.util.LinkedList;
+import java.util.Scanner;
+
+/* 
+* TestVideoclub es la clase que se encarga de testear el programa de gestion del videoclub.
+* Usa tres tipos de almacenamiento de datos:
+* Un array estatico, para almacenar las peliculas existentes en el videoclub. Es estatico 
+* ya que no gestionaremos el almacen de peliculas por lo que no introduciremos ninguna
+* en tiempo de ejecucion.
+* Dos listas dinamicas, una para gestionar a los empleados y otra para gestionar a los 
+* socios.
+*
+*/
+/**
+ * Clase encargada de testear la aplicacion. Contiene 3 variables estaticas
+ * encargadas del almacenamiento de los diferentes datos (peliculas, socios y
+ * empleados) Peliculas - se almacenaran en un array final porque no se van a
+ * modificar en tiempo de ejecucion. Socios y empleados - se almacenaran en
+ * sendas listas dinámicas.
+ * 
+ * @author Elias Merabet
+ */
+public class TestVideoclub {
+
+	/*
+	 * Defino como variables de clase, accesibles en toda ella, los tres tipos
+	 * de almacenamiento de datos.
+	 */
+
+	// Creo un array static (comun para todo el test videoclub) y final (porque
+	// los usuarios
+	// no podran introducir o eliminar peliculas).
+	// Aplico el polimorfismo proporcionado por la clase abstracta Pelicula.
+	// Defino el array
+	// como Pelicula e introduzco objetos de las clases derivadas (Terror, Amor
+	// y Scifi).
+	static final Pelicula[] cartelera = { (new Amor("Amor1", 100, "Una historia de amor1.", 1)),
+			(new Amor("Amor2", 110, "Una historia de amor2.", 2)),
+			(new Amor("Amor3", 120, "Una historia de amor3.", 3)),
+			(new Terror("Terror1", 100, "Una historia de terror1.", 1)),
+			(new Terror("Terror2", 110, "Una historia de terror2.", 2)),
+			(new Terror("Terror3", 120, "Una historia de terror3.", 3)),
+			(new Scifi("Scifi1", 100, "Una historia de Scifi1.", 1)),
+			(new Scifi("Scifi2", 110, "Una historia de Scifi2.", 2)),
+			(new Scifi("Scifi3", 120, "Una historia de Scifi3.", 3)) };
+
+	// Una lista dinamica para los clientes del videoclub ya que podra ser
+	// modificada en tiempo
+	// de ejecucion.
+	static LinkedList<Cliente> clientes = new LinkedList<Cliente>();
+
+	// Una lista dinamica para los empleados del videoclub.
+	// Uso polimorfismo mediante interfaz empleado.
+	static LinkedList<Empleado> empleados = new LinkedList<Empleado>();
+
+	/**
+	 * El main se encarga de mostrar el menu y segun la opcion elegida realizar
+	 * las operaciones apropiadas fuera de el.
+	 * 
+	 * @param args
+	 *            parametros que le pasare al main y proceden de consola.
+	 *
+	 */
+
+	public static void main(String[] args) {
+
+		/*
+		 * Desde el main mostrare los diferentes menus que componen el programa
+		 * de gestion y llamare a los respectivos metodos dentro de la misma
+		 * clase. (estaticos tambien para evitar crear un objeto).
+		 */
+
+		Scanner lector = new Scanner(System.in);
+		int continuar = 1;
+
+		while (continuar == 1) {
+			System.out.println("-- .BIENVENIDO AL PROGRAMA DE GESTION DEL VIDEOCLUB. --\n");
+			// Creo un objeto tipo LocalDateTime para obtener fecha actual del
+			// sistema
+			// y mostrarla por pantalla.
+			LocalDateTime fecha = LocalDateTime.now();
+			System.out.println("\n-- Hoy es -- " + fecha.getDayOfMonth() + " / " + fecha.getMonth() + " / "
+					+ fecha.getYear() + ". --");
+			System.out.println("-- Son las -- " + fecha.getHour() + " : " + fecha.getMinute() + " : "
+					+ fecha.getSecond() + ". --\n");
+			System.out.println("(A) - Gestionar los Socios.");
+			System.out.println("(B) - Mostrar las Peliculas.");
+			System.out.println("(C) - Gestionar los Empleados.");
+			System.out.println("(D) - Backup.");
+			System.out.println("(E) - Cerrar el programa.");
+			System.out.println("Por favor, seleccione una de las opciones: ");
+			String opcion = lector.nextLine().toUpperCase();
+
+			switch (opcion) {
+			case "A":
+				int continuarA = 1;
+
+				while (continuarA == 1) {
+					System.out.println("-- .PROGRAMA DE GESTION DE SOCIOS. --");
+					System.out.println("(A) - Nuevo Socio.");
+					System.out.println("(B) - Eliminar Socio.");
+					System.out.println("(C) - Submenu de acción del Socio.");
+					System.out.println("(D) - Mostrar Informacion del Socio.");
+					System.out.println("(E) - Salir.");
+					System.out.println("Por favor, seleccione una de las opciones: ");
+					String opcionA = lector.nextLine().toUpperCase();
+
+					switch (opcionA) {
+					case "A":
+						boolean creado = TestVideoclub.crearSocio(lector);
+						// si no devuelve true es porque salto la excepcion.
+						// Salgo del programa.
+						if (!creado) {
+							// return sale del procedimiento y como es el main
+							// dara por
+							// concluido el programa.
+							return;
+						}
+						break;
+					case "B":
+						Cliente c = TestVideoclub.seleccionarSocio(lector);
+
+						if (c != null) {
+							clientes.remove(c);
+							System.out.println("El cliente ha sido eliminado correctamente.");
+						} else
+							System.out.println("No disponemos de ningun cliente con ese DNI.");
+						break;
+					case "C":
+						Cliente c1 = TestVideoclub.seleccionarSocio(lector);
+						if (c1 != null) {
+							TestVideoclub.menuSocio(c1, lector);
+						} else
+							System.out.println("No disponemos de ningun cliente con ese DNI.");
+						break;
+					case "D":
+						Cliente c2 = TestVideoclub.seleccionarSocio(lector);
+						if (c2 != null) {
+							System.out.println(c2.verPersona());
+						} else
+							System.out.println("No existe ningun cliente con ese DNI.");
+						break;
+					case "E":
+						continuarA = 0;
+						System.out.println("Gracias por usar este servicio.");
+						break;
+					default:
+						System.out.println("Opcion incorrecta");
+						break;
+					}
+				}
+				break;
+			case "B":
+				System.out.println(TestVideoclub.mostrarPeliculas());
+				break;
+			case "C":
+				int continuarB = 1;
+
+				while (continuarB == 1) {
+					System.out.println("-- .PROGRAMA DE GESTION DE EMPLEADOS. --");
+					System.out.println("(A) - Contratar Jefe.");
+					System.out.println("(B) - Despedir Jefe.");
+					System.out.println("(C) - Contratar Currito.");
+					System.out.println("(D) - Despedir Currito.");
+					System.out.println("(E) - Mostrar Empleado.");
+					System.out.println("(F) - Salir.");
+					System.out.println("Por favor, seleccione una de las opciones: ");
+					String opcionB = lector.nextLine().toUpperCase();
+
+					switch (opcionB) {
+					case "A":
+						TestVideoclub.crearJefe(lector);
+						break;
+					case "B":
+						TestVideoclub.eliminarEmpleado(lector);
+						break;
+					case "C":
+						TestVideoclub.crearCurrito(lector);
+						break;
+					case "D":
+						TestVideoclub.eliminarEmpleado(lector);
+						break;
+					case "E":
+						TestVideoclub.mostrarEmpleado(lector);
+						break;
+					case "F":
+						continuarB = 0;
+						System.out.println("Gracias por usar este servicio.");
+						break;
+					default:
+						System.out.println("Opcion incorrecta.");
+						break;
+					}
+				}
+				break;
+			case "D":
+				TestVideoclub.menuBackup(lector);
+				break;
+			case "E":
+				continuar = 0;
+				System.out.println("Gracias por usar este servicio.");
+				break;
+			default:
+				System.out.println("Opcion incorrecta.");
+				break;
+			}
+
+		}
+
+		// Fuerzo la recoleccion basura para liberar memoria al final del main.
+		Runtime run = Runtime.getRuntime();
+		run.gc();
+
+	}
+
+	/**
+	 * crearSocio se encarga de pedir los datos para la creacion de un socio y
+	 * almacenarlo en el programa.
+	 * 
+	 * @param lector
+	 *            Scanner para entrada de datos por consola.
+	 * @return boleano para indicar si se pudo crear o no el socio.
+	 */
+	public static boolean crearSocio(Scanner lector) {
+
+		/*
+		 * Este metodo se encarga de crear un socio. Pide los parametros
+		 * necesarios para llamar a su constructor y se encarga de añadirlo a la
+		 * lista dinamica. Se encuentra en un try-catch porque gestionaremos
+		 * 
+		 */
+		System.out.println("Por favor, introduzca los siguientes datos del nuevo cliente.");
+		System.out.println("Nombre:");
+		String nombre = lector.nextLine();
+		System.out.println("DNI:");
+		int dni = Integer.parseInt(lector.nextLine());
+
+		boolean encontrado = false;
+		int i = 0;
+		while (i < clientes.size() && !encontrado) {
+			if (dni == clientes.get(i).getDni())
+				encontrado = true;
+			else
+				i++;
+		}
+
+		if (!encontrado) {
+			try {
+				clientes.add(new Cliente(nombre, dni));
+				System.out.println("Cliente creado correctamente.");
+				return true;
+			} catch (NoPuedeSerException e) {
+				System.out.println("Se ha producido el evento " + e.getMessage());
+				return false;
+			}
+		} else {
+			System.out.println("Ya existe un cliente con ese DNI.");
+			return true;
+		}
+	}
+
+	/**
+	 * Busca un socio a traves de su DNI.
+	 * 
+	 * @param lector
+	 *            Scanner para entrada de datos por consola.
+	 * @return cliente devuelve el cliente que hemos buscado.
+	 */
+	public static Cliente seleccionarSocio(Scanner lector) {
+
+		System.out.println("Por favor, introduzca el DNI del cliente a seleccionar.");
+		System.out.println("DNI:");
+		int dni = Integer.parseInt(lector.nextLine());
+
+		boolean encontrado = false;
+		int i = 0;
+		while (i < clientes.size() && !encontrado) {
+			if (dni == clientes.get(i).getDni())
+				encontrado = true;
+			else
+				i++;
+		}
+		if (encontrado)
+			return clientes.get(i);
+		else
+			return null;
+	}
+
+	/**
+	 * muestra el submenu de accion de socio una vez que se haya seleccionado un
+	 * socio.
+	 * 
+	 * @param c
+	 *            Cliente para el que saldra el menu del socio.
+	 * @param l
+	 *            Scanner para la lectura de datos por consola.
+	 */
+	public static void menuSocio(Cliente c, Scanner l) {
+
+		int continuar = 0;
+		while (continuar == 0) {
+			System.out.println("-- .SUBMENU DE SOCIOS. --");
+			System.out.println("(A) - Alquilar Pelicula.");
+			System.out.println("(B) - Devolver Pelicula.");
+			System.out.println("(C) - Mostrar Informacion del Socio.");
+			System.out.println("(D) - Salir.");
+			System.out.println("Indique una de las opciones: ");
+			String opcion = l.nextLine().toUpperCase();
+
+			if (opcion.equals("A")) {
+				System.out.println(TestVideoclub.mostrarPeliculas());
+				System.out.println("Indique el numero de la pelicula que desea alquilar.");
+				int p = Integer.parseInt(l.nextLine());
+
+				if (cartelera[p].getCli() == null) {
+					System.out.println("El precio de la pelicula es " + cartelera[p].precio());
+					cartelera[p].setCli(c);
+				} else
+					System.out.println("La pelicula se encuentra ya alquilada.");
+			} else if (opcion.equals("B")) {
+				System.out.println(TestVideoclub.mostrarPeliculas());
+				System.out.println("Indique el numero de la pelicula que desea devolver.");
+				int p = Integer.parseInt(l.nextLine());
+
+				if (cartelera[p].getCli() != null) {
+					cartelera[p].setCli(null);
+					System.out.println("La pelicula ha sido devuelta correctamente.");
+				} else if (cartelera[p].getCli() == null) {
+					System.out.println("La pelicula ya fue devuelta.");
+				}
+			} else if (opcion.equals("C")) {
+				System.out.println(c.verPersona());
+			} else if (opcion.equals("D")) {
+				continuar = 1;
+			} else {
+				System.out.println("Opcion incorrecta.");
+			}
+		}
+	}
+
+	/**
+	 * muestra por pantalla todas las peliculas disponibles en la aplicacion.
+	 * 
+	 * @return informacion de la peliculas disponibles en la aplicacion.
+	 */
+	public static String mostrarPeliculas() {
+
+		String inf = "\n-- .PELICULAS DEL VIDEOCLUB. --\n" + "-----------------------------\n";
+		for (int i = 0; i < cartelera.length; i++) {
+			inf += "La pelicula numero: (" + (i) + "), es " + cartelera[i].toString()
+					+ ".. [ESTA PELICULA TIENE UNA INTENSIDAD DE  " + cartelera[i].intensidad() + "].\n";
+		}
+		return inf;
+	}
+
+	/**
+	 * se encarga de pedir los datos para la creacion de un nuevo jefe y, si es
+	 * posible, lo almacena en el programa.
+	 * 
+	 * @param lector
+	 *            Scanner para la lectura de datos por consola.
+	 */
+	public static void crearJefe(Scanner lector) {
+
+		// Compruebo si se pueden contratar mas jefes.
+		if (Jefe.getNumJefes() < Jefe.getNummaxJefes()) {
+			System.out.println("Por favor, introduzca el siguiente dato del jefe.");
+			System.out.println("Nombre:");
+			String nombre = lector.nextLine();
+			System.out.println("DNI:");
+			int dni = Integer.parseInt(lector.nextLine());
+
+			int i = 0;
+			boolean b = false;
+			while (i < empleados.size() && !b) {
+				if (empleados.get(i).getDni() == dni) {
+					b = true;
+				} else {
+					i++;
+				}
+			}
+
+			if (!b) {
+				empleados.add(new Jefe(nombre, dni, Jefe.getNumJefes() + 1));
+				System.out.println("Jefe creado correctamente.");
+			} else
+				System.out.println("Ya existe un empleado con ese dni.");
+
+		} else
+			System.out.println("El numero de jefes posibles esta completo. No se puede " + "contratar mas.");
+	}
+
+	/**
+	 * crea un currito.
+	 * 
+	 * @param lector
+	 *            scanner para la lectura de datos por consola.
+	 */
+	public static void crearCurrito(Scanner lector) {
+
+		// Compruebo si se pueden contratar mas curritos.
+		if (Currito.getNumCurritos() < Currito.getNumMaxCurritos()) {
+			System.out.println("Por favor, introduzca el siguientes dato del currito.");
+			System.out.println("Nombre:");
+			String nombre = lector.nextLine();
+			System.out.println("DNI:");
+			int dni = Integer.parseInt(lector.nextLine());
+
+			int i = 0;
+			boolean b = false;
+			while (i < empleados.size() && !b) {
+				if (empleados.get(i).getDni() == dni) {
+					b = true;
+				} else {
+					i++;
+				}
+			}
+
+			if (!b) {
+				empleados.add(new Currito(nombre, dni, Currito.getNumCurritos() + 1));
+				System.out.println("Currito creado correctamente.");
+			} else
+				System.out.println("Ya existe un empleado con ese dni.");
+		} else
+			System.out.println("El numero de curritos posibles esta completo. No se puede " + "contratar mas.");
+
+	}
+
+	/**
+	 * se encarga de borrar del almacenamiento del programa el empleado
+	 * indicado.
+	 * 
+	 * @param lector
+	 *            scanner para la recepcion de datos por consola.
+	 */
+	public static void eliminarEmpleado(Scanner lector) {
+
+		/*
+		 * Aprovecho el polimorfismo que me ofrece el interface empleado para no
+		 * tener que crear dos metodos eliminar. Uno para jefe y otro para
+		 * currito.
+		 */
+
+		System.out.println("Por favor, introduzca el siguiente dato del empleado a despedir.");
+		System.out.println("DNI:");
+		int dni = Integer.parseInt(lector.nextLine());
+
+		int i = 0;
+		boolean b = false;
+		while (i < empleados.size() && !b) {
+			if (empleados.get(i).getDni() == dni) {
+				b = true;
+			} else {
+				i++;
+			}
+		}
+
+		if (b) {
+			empleados.remove(i);
+			System.out.println("Empleado despedido correctamente.");
+		} else
+			System.out.println("No existe un empleado con ese DNI.");
+	}
+
+	/**
+	 * muestra la informacion del empleado cuyo DNI corresponde con el que le
+	 * pasemos por consola.
+	 * 
+	 * @param lector
+	 *            scanner para la lectura de datos por consola.
+	 */
+	public static void mostrarEmpleado(Scanner lector) {
+
+		/*
+		 * Aprovecho el polimorfismo que me ofrece el interface empleado para no
+		 * tener que crear dos metodos mostrar. Uno para jefe y otro para
+		 * currito.
+		 */
+
+		System.out.println("Por favor, introduzca el siguiente dato del empleado a mostrar.");
+		System.out.println("DNI:");
+		int dni = Integer.parseInt(lector.nextLine());
+
+		boolean b = false;
+		int i = 0;
+		while (i < empleados.size() && !b) {
+			if (empleados.get(i).getDni() == dni) {
+				b = true;
+			} else {
+				i++;
+			}
+		}
+
+		// Juego un poco con la introspeccion de Java para mostrar un string
+		// adicional.
+		if (b && empleados.get(i) instanceof Jefe) {
+			System.out.println(
+					" -- JEFE -- \n" + empleados.get(i).verPersona() + "\n" + empleados.get(i).verEmpleado() + "\n");
+		} else if (b && empleados.get(i) instanceof Currito) {
+			System.out.println(
+					" -- CURRITO -- \n" + empleados.get(i).verPersona() + "\n" + empleados.get(i).verEmpleado() + "\n");
+		} else if (!b) {
+			System.out.println("No se ha encontrado el empleado.");
+		}
+	}
+
+	/**
+	 * Muestra el submenu de backup
+	 * 
+	 * @param lector
+	 *            scanner para la lectura del teclado.
+	 *
+	 */
+	public static void menuBackup(Scanner lector) {
+		int continuar = 0;
+		while (continuar == 0) {
+			System.out.println("-- .SUBMENU BACKUP. --");
+			System.out.println("(A) - Salvar informacion en fichero.");
+			System.out.println("(B) - Recuperar informacion desde fichero");
+			System.out.println("(C) - Salir.");
+			System.out.println("Indique una de las opciones: ");
+			String opcion = lector.nextLine().toUpperCase();
+
+			switch (opcion) {
+			case "A":
+				TestVideoclub.salvar(lector);
+				break;
+			case "B":
+				TestVideoclub.recuperarInformacion(lector);
+				break;
+			case "C":
+				System.out.println("Gracias por usar nuestros servicios.");
+				continuar = 1;
+				break;
+			default:
+				System.out.println("Opcion incorrecta.");
+				break;
+			}
+
+		}
+	}
+
+	/**
+	 * Se encarga de salvar la informacion de clientes y empleados a una
+	 * ubicacion en disco.
+	 * 
+	 * @param lector
+	 *            scanner para la lectura del teclado.
+	 *
+	 */
+	public static void salvar(Scanner lector) {
+
+		System.out.println("Introduzca la ruta donde desea salvar la informacion"
+				+ "\n (Ej: C:\\ejemplo), la carpeta destino debera encontrarse" + "\nen la raiz: ");
+		String path = lector.nextLine();
+		System.out.println("Introduzca el nombre del archivo " + "\ndonde desea salvar la informacion: ");
+		String archivo = lector.nextLine();
+
+		File carpeta = new File(path);
+		carpeta.mkdir();
+
+		FileOutputStream ficheroClientes;
+		FileOutputStream ficheroEmpleados;
+		try {
+			ficheroClientes = new FileOutputStream(path + "\\Clientes" + archivo + ".obj");
+			ficheroEmpleados = new FileOutputStream(path + "\\Empleados" + archivo + ".obj");
+		} catch (IOException e) {
+			System.out.println("No se puede crear el archivo");
+			return;
+		}
+
+		ObjectOutputStream escritorClientes = null;
+		try {
+			escritorClientes = new ObjectOutputStream(ficheroClientes);
+		} catch (IOException e1) {
+			System.out.println(e1.getMessage());
+		}
+
+		try {
+			escritorClientes.writeObject(clientes);
+			System.out.println("Informacion clientes salvada con exito.");
+		} catch (IOException e) {
+			System.out.println("No se puede escribir en archivo la informacion de los clientes.");
+		}
+
+		try {
+			escritorClientes.close();
+			ficheroClientes.close();
+		} catch (IOException e) {
+			System.out.println(e.getMessage());
+		}
+
+		ObjectOutputStream escritorEmpleados = null;
+		try {
+			escritorEmpleados = new ObjectOutputStream(ficheroEmpleados);
+		} catch (IOException e1) {
+			System.out.println(e1.getMessage());
+		}
+
+		try {
+			escritorEmpleados.writeObject(empleados);
+			System.out.println("Informacion empleados salvada con exito.");
+		} catch (IOException err) {
+			System.out.println("No se puede escribir en archivo la informacion de los empleados.");
+		}
+
+		try {
+			escritorEmpleados.close();
+			ficheroEmpleados.close();
+		} catch (IOException e) {
+			System.out.println(e.getMessage());
+		}
+	}
+
+	/**
+	 * Se encarga de recuperar la informacion de los clientes y de los empleados
+	 * desde una ubicacion en disco.
+	 * 
+	 * @param lector
+	 *            Scanner para entrada de datos por teclado.
+	 */
+	public static void recuperarInformacion(Scanner lector) {
+
+		System.out.println("Introduzca la ruta donde se encuentra el archivo de backup"
+				+ "(\nEj: C:\\) y que la carpeta fuente debera encontrarse" + "\nen la raiz: ");
+		String path = lector.nextLine();
+		System.out.println("Introduzca el nombre del archivo " + "desde donde desea recuperar la informacion: ");
+		String archivo = lector.nextLine();
+
+		FileInputStream ficheroClientes;
+		ObjectInputStream lecturaClientes;
+		try {
+			ficheroClientes = new FileInputStream(path + "\\Clientes" + archivo + ".obj");
+			lecturaClientes = new ObjectInputStream(ficheroClientes);
+		} catch (IOException e) {
+			System.out.println("No existe el archivo");
+			return;
+		}
+
+		try {
+			// Hago cast desde objeto (devuelto por readObject) a
+			// LinkedList<Cliente>.
+			clientes = (LinkedList<Cliente>) lecturaClientes.readObject();
+			System.out.println("Información de los clientes recuperada con exito.");
+		} catch (ClassNotFoundException | IOException e1) {
+			System.out.println(e1.getMessage());
+		}
+
+		try {
+			lecturaClientes.close();
+			ficheroClientes.close();
+		} catch (IOException err3) {
+			System.out.println(err3.getMessage());
+		}
+
+		FileInputStream ficheroEmpleados;
+		ObjectInputStream lecturaEmpleados;
+		try {
+			ficheroEmpleados = new FileInputStream(path + "\\Empleados" + archivo + ".obj");
+			lecturaEmpleados = new ObjectInputStream(ficheroEmpleados);
+		} catch (IOException e) {
+			System.out.println("No existe el archivo");
+			return;
+		}
+
+		try {
+			// Hago cast desde objeto (devuelto por readObject) a
+			// LinkedList<Empleado>.
+			empleados = (LinkedList<Empleado>) lecturaEmpleados.readObject();
+			System.out.println("Información de los empleados recuperada con exito.");
+		} catch (ClassNotFoundException | IOException e1) {
+			System.out.println(e1.getMessage());
+		}
+
+		try {
+			lecturaEmpleados.close();
+			ficheroEmpleados.close();
+		} catch (IOException err7) {
+			System.out.println(err7.getMessage());
+		}
+
+	}
+
+}
