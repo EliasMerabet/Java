@@ -1,0 +1,32 @@
+public static void main(String[] args) {
+        try {
+            DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
+
+            Connection conexion = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE", "system", "javaoracle");
+
+            Statement sentencia = conexion.createStatement();
+
+            ResultSet rs = sentencia.executeQuery("select * from emp");
+            ResultSetMetaData columnas = rs.getMetaData();
+            int campos = columnas.getColumnCount();
+
+            System.out.println("NOMBRE DE LAS COLUMNAS");
+            //Imprimir nombre de columnas
+            for (int j = 0; j < campos; j++) {
+                System.out.print(columnas.getColumnName(j+1).toUpperCase() + "-");
+            }
+
+            System.out.println("\nREGISTROS");
+            
+            while (rs.next()) {
+                //j hace que sea dinamico, voy columna por columna desde 0 hasta
+                //el numero de columnas.
+                System.out.println("");
+                for (int j = 0; j < campos; j++) {
+                    System.out.print(rs.getString(j+1) + " ");
+                }
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error al ejecutar:" + e.toString());
+        }
