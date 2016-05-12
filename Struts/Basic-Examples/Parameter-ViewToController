@@ -1,0 +1,144 @@
+VIEW.
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
+<%@ taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
+<%@ taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>JSP Page</title>
+    </head>
+
+    <body>
+        <html:form action="/Oficios">
+            <table style="border: 2px solid black;">
+                <tr style="border: 2px solid black;">
+                    <th style="border: 2px solid black;">Seleccione un oficio: </th>
+                    <th style="border: 2px solid black;">
+                        <html:select property="oficio" onchange="submit();">
+                            <html:options collection="empleados" property="value" labelProperty="value"/>
+                        </html:select>
+                    </th>
+                </tr>
+                <tr style="border: 2px solid black;">
+                    <td colspan="2" style="border: 2px solid black;">
+                        <logic:present name="datos">
+                            <logic:iterate name="datos" id="datosId">
+                                <p>
+                                    <bean:write name="datosId"/>
+                                </p>
+                            </logic:iterate>
+                        </logic:present>
+                    </td>
+                </tr>
+            </table>
+        </html:form>
+    </body>
+
+</html>
+
+CONTROLLER.
+package controlador;
+
+import com.sun.org.apache.xalan.internal.xsltc.runtime.Hashtable;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionServlet;
+import org.apache.struts.config.ModuleConfig;
+
+/**
+ *
+ * @author alumno
+ */
+public class ControlAOficiosAction extends org.apache.struts.action.Action
+implements org.apache.struts.action.PlugIn {
+
+    private static Connection cn;
+    private Statement st;
+    private PreparedStatement ps;
+    private ResultSet rs,rs1;
+    
+    /**
+     * This is the action called from the Struts framework.
+     *
+     * @param mapping The ActionMapping used to select this instance.
+     * @param form The optional ActionForm bean for this request.
+     * @param request The HTTP Request we are processing.
+     * @param response The HTTP Response we are processing.
+     * @throws java.lang.Exception
+     * @return
+     */
+    @Override
+    public ActionForward execute(ActionMapping mapping, ActionForm form,
+            HttpServletRequest request, HttpServletResponse response)
+            throws Exception {
+        
+        List<String> datosL = new ArrayList<String>();
+        
+        try{
+            
+        DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
+        cn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "system", "javaoracle");
+        
+        String ofi = request.getParameter("oficio");
+        
+        ps = cn.prepareStatement("select apellido, oficio, salario from emp where oficio = ?");
+        ps.setString(1, request.getParameter("oficio"));
+        rs1 = ps.executeQuery();
+        
+        while(rs1.next()){
+            datosL.add(rs1.getString(1) + ", " + rs1.getString(2)+ ", TOTAL SALARIO: " + Integer.toString(rs1.getInt(3)));
+        }
+        
+        } catch (SQLException ex) {
+            Logger.getLogger(ControlAOficiosAction.class.getName()).log(Level.SEVERE, null, ex);
+        }
+            
+        request.setAttribute("datos", datosL);
+        return mapping.getInputForward();
+        
+    }
+    
+   @Override
+    public void init(ActionServlet servlet, ModuleConfig config) throws ServletException 
+    {
+        
+        HashMap<Integer,String> empleadosHM = new HashMap<Integer,String>();
+        int i = 1;
+        
+        try {
+            DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
+            cn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "system", "javaoracle");
+            
+            st = cn.createStatement();
+            rs = st.executeQuery("select distinct oficio from emp");
+            
+            while(rs.next()){
+                empleadosHM.put(i,rs.getString(1));
+                i++;
+            }
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(ControlAOficiosAction.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        servlet.getServletContext().setAttribute("empleados", empleadosHM);
+    }
+}
