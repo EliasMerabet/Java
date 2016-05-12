@@ -1,0 +1,120 @@
+package android.android11_listviewycontactos;
+
+import android.database.Cursor;
+import android.provider.ContactsContract;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity {
+
+    private String[] ciudades = { "Madrid", "Valencia", "Sevilla", "Zaragoza",
+            "Malaga", "Gijón", "Palma", "Bilbao", "Alicante", "Vigo" };
+    private String[] habitantes = { "3233527", "797028", "702355",
+            "679624", "567433", "441354", "407648", "351629",
+            "334678", "297355" };
+    ArrayList<Contacto> lista = new ArrayList();
+    private TextView lblmensaje;
+    private ListView lsv1;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        this.lblmensaje = (TextView)findViewById(R.id.lblmensaje);
+        this.lsv1 = (ListView)findViewById(R.id.lsvcontactos);
+
+        this.lsv1.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView parent, View view, int position, long id) {
+                Contacto c = (Contacto)lsv1.getItemAtPosition(position);
+                lblmensaje.setText("Número de llamadas de " + c.getNombre() + ": "
+                        + c.getLlamadas());
+            }
+        });
+
+    }
+
+    public void leerContactos(View v)
+    {
+        //DEFINO UN ARRAY DE DOS COLUMNAS DONDE ALMACENO LAS COLUMNAS QUE VOY A PEDIR A LA URI.
+        String sColumnas[] = { ContactsContract.Contacts.DISPLAY_NAME,
+                ContactsContract.Contacts.TIMES_CONTACTED };
+
+        // Queries the user dictionary and returns results
+       // The content URI of the words table
+       // The columns to return for each row
+      // Selection criteria
+      // Selection criteria
+      // The sort order for the returned rows
+
+        Cursor cursorContactos = getContentResolver().query(
+                ContactsContract.Contacts.CONTENT_URI, sColumnas, null, null,
+                ContactsContract.Contacts.DISPLAY_NAME);
+        cursorContactos.moveToFirst();
+        this.lista.clear();
+        while (!cursorContactos.isAfterLast()) {
+            String nombrecontacto = cursorContactos.getString(cursorContactos
+                    .getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME));
+            int numerollamadas = cursorContactos.getInt(cursorContactos
+                    .getColumnIndexOrThrow(ContactsContract.Contacts.TIMES_CONTACTED));
+
+            Contacto c = new Contacto();
+            c.setNombre(nombrecontacto);
+            c.setLlamadas(numerollamadas);
+            this.lista.add(c);
+            cursorContactos.moveToNext();
+        }
+        cursorContactos.close();
+        this.lblmensaje.setText("Contactos leidos correctamente");
+        ArrayAdapter<Contacto> datoscontactos = new ArrayAdapter<Contacto>(this, android.R.layout.simple_list_item_1,lista);
+
+        this.lsv1.setAdapter(datoscontactos);
+    }
+
+}
+
+CLASS.
+package android.android11_listviewycontactos;
+
+/**
+ * Created by alumno on 14/12/2015.
+ */
+public class Contacto {
+
+    private String nombre;
+    private int llamadas;
+
+    @Override
+    public String toString()
+    {
+        return this.nombre;
+    }
+
+    public int getLlamadas() {
+        return llamadas;
+    }
+
+    public void setLlamadas(int llamadas) {
+        this.llamadas = llamadas;
+    }
+
+    public String getNombre() {
+
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+
+}
