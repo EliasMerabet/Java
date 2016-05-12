@@ -1,0 +1,58 @@
+<%@page import="java.sql.Statement"%>
+<%@page import="java.sql.ResultSet"%>
+<%@page import="java.sql.PreparedStatement"%>
+<%@page import="java.sql.Connection"%>
+<%@page import="java.sql.DriverManager"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+    
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>JSP Page</title>
+    </head>
+    
+    <body>
+        <%! String html1;%>
+        <%
+            html1 = "<h1><strong>DOCTORES DE HOSPITAL</strong></h1><form action='DoctoresHospital.jsp'/>";
+            DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
+            Connection conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE", "system", "javaoracle");
+            PreparedStatement ps1 = conn.prepareStatement("select hospital_cod, nombre from hospital");
+            ResultSet rset = ps1.executeQuery();
+            while (rset.next()){
+                html1 += "<input type='checkbox' name='hospital' value='" + rset.getInt(1) + "'>" + rset.getString(2) + "<br>";
+            }
+            html1 += "<br><br><br><br><input type='submit' value='Mostrar Doctores'/><hr>";
+        %>
+        
+        <%=html1%>
+        
+        <table>
+            <tr style='border: 2px solid black'>
+                <td style='border: 2px solid black; background-color: #00ffff'>Apellido</td>
+                <td style='border: 2px solid black; background-color: #00ffff'>Especialidad</td>
+                <td style='border: 2px solid black; background-color: #00ffff'>Salario</td>
+                
+                <%!String html;%>
+                <%
+                  html = "";
+                  if (request.getParameterValues("hospital") != null){
+                    String hos[] = request.getParameterValues("hospital");
+                  for(int i = 0; i < hos.length; i++){
+                  PreparedStatement ps = conn.prepareStatement("select apellido, especialidad, salario from doctor where "
+                          + "hospital_cod = ?");
+                  ps.setString(1, hos[i]);
+                  ResultSet rset1 = ps.executeQuery();
+                  while(rset1.next()){
+                  html += "<tr style='border: 2px solid black'><td style='border: 2px solid black'>" + rset1.getString(1) + "</td><td style='border: 2px solid black'>" + rset1.getString(2) + "</td>"
+                          + "<td style='border: 2px solid black'>" + rset1.getString(3) + "</td></tr>";
+                  }
+                  }
+                  }
+                %>
+                <%=html%>
+        </table>
+    </body>
+    
+</html>
