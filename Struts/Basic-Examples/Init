@@ -1,0 +1,32 @@
+@Override
+    public void init(ActionServlet servlet, ModuleConfig config) throws ServletException {
+        
+        try {
+            ArrayList<Empleado> empleadosL = new ArrayList<>();
+
+            Statement st;
+            ResultSet rs;
+
+            conectar();
+
+            st = cn.createStatement();
+            rs = st.executeQuery("select codigo_empleado, nombre, apellido, telefono, comision, turno, to_char(fecha_alta, 'dd-mm-yyyy') from GERENTE.empleados order by apellido asc");
+
+            while (rs.next()) {
+                Empleado empleado = new Empleado();
+                empleado.setCod(rs.getInt(1));
+                empleado.setNom(rs.getString(2));
+                empleado.setApe(rs.getString(3));
+                empleado.setTel(rs.getInt(4));
+                empleado.setCom(rs.getInt(5));
+                empleado.setTur(rs.getString(6));
+                empleado.setFa(rs.getString(7));
+                empleadosL.add(empleado);
+                empleado = null;
+            }
+            cn.close();
+            servlet.getServletContext().setAttribute("empleados", empleadosL);
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+        }
+    }
