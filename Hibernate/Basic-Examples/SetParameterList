@@ -1,0 +1,12 @@
+    public void borrarSocios(ArrayList<Integer> cad) {
+        String hql = "delete from Socios where codigoSocio in (:cadena)";
+
+        if (!this.session.isOpen()) {
+            this.iniciarConexion();
+        }
+        
+        Query query = session.createQuery(hql);
+        query.setParameterList("cadena", cad);
+        query.executeUpdate();
+        this.tx.commit();
+    }
