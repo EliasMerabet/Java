@@ -1,0 +1,223 @@
+VIEW.
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt"%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+    "http://www.w3.org/TR/html4/loose.dtd">
+
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Welcome to Spring Web MVC project</title>
+        <script>
+            function enviar(dato) {
+                form.opcion.value = dato;
+                form.submit();
+            }
+        </script>
+    </head>
+
+    <body>
+<!--PARA MOSTRAR DIRECTAMENTE AL CARGAR LA PAGINA DEBO TENER EN CUENTA QUE EL REDIRECT VA DIRECTAMENTE AL IDNEX
+POR ELLO TENDRIA QUE MOSTRAR LA TABLA EN EL CONTROLADOR DEL INDEX.-->
+        <form action="ControladorDept.htm" name="form">
+            <h1>DEPARTAMENTOS</h1><br>
+            <p>Numero : </p><input type="text" name="numero"/><br>
+            <p>Nombre : </p><input type="text" name="nombre"/><br>
+            <p>Localidad : </p><input type="text" name="localidad"/><br><br>
+            <c:if test="${conf != null}">
+                <p>Accion realizada con exito...</p><br><br>
+            </c:if>
+            <input type="hidden" name="opcion"/>
+            <input type="button" name="insertar" value="Insertar" onclick="enviar('insertar');"/>
+            <input type="button" name="modificar" value="Modificar" onclick="enviar('modificar');"/>
+            <input type="button" name="eliminar" value="Eliminar" onclick="enviar('eliminar');"/>
+        </form>
+
+        <br><br><table>
+            <c:if test="${depts != null}">
+                <c:forEach items="${depts}" var="dept">
+                    <tr>
+                        <td>${dept.dnumero}</td>
+                        <td>${dept.dnombre}</td>
+                        <td>${dept.dlocalidad}</td>
+                    </tr>
+                </c:forEach>
+
+            </c:if>
+        </table>
+
+    </body>
+
+</html>
+
+CONTROLLER.
+package controlador;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
+import utils.Conexion;
+import utils.Dept;
+
+/**
+ *
+ * @author alumno
+ */
+public class ControladorDept extends MultiActionController {
+
+    Connection cn;
+
+    public ModelAndView insertar(HttpServletRequest hsr, HttpServletResponse hsr1) throws Exception {
+        
+        ModelAndView mv = new ModelAndView("index");
+        ServletContext sc = hsr.getServletContext();
+        conectar(sc);
+
+        int num = Integer.parseInt(hsr.getParameter("numero"));
+        String nom = hsr.getParameter("nombre");
+        String lo = hsr.getParameter("localidad");
+
+        PreparedStatement ps;
+        Statement st;
+        ResultSet rs;
+        
+        List<Dept> depts = new ArrayList<>();
+        
+        ps = cn.prepareCall("insert into dept values(?,?,?)");
+        ps.setInt(1, num);
+        ps.setString(2, nom);
+        ps.setString(3, lo);
+        int af = ps.executeUpdate();
+        
+        if (af > 0) {
+            mv.addObject("conf", "guay");
+        }
+
+        st = cn.createStatement();
+        rs = st.executeQuery("select * from dept");
+        
+        while (rs.next()){
+            Dept dept = new Dept();
+            dept.setDnumero(rs.getInt(1));
+            dept.setDnombre(rs.getString(2));
+            dept.setDlocalidad(rs.getString(3));
+            depts.add(dept);
+        }
+        
+        mv.addObject("depts", depts);
+        
+        return mv;
+
+    }
+
+    public ModelAndView modificar(HttpServletRequest hsr, HttpServletResponse hsr1) throws Exception {
+
+        ModelAndView mv = new ModelAndView();
+
+        ServletContext sc = hsr.getServletContext();
+        conectar(sc);
+
+        int num = Integer.parseInt(hsr.getParameter("numero"));
+        String nom = hsr.getParameter("nombre");
+        String lo = hsr.getParameter("localidad");
+
+        PreparedStatement ps;
+        Statement st;
+        ResultSet rs;
+        
+        List<Dept> depts = new ArrayList<>();
+
+        ps = cn.prepareCall("update into dept set dnombre = ?, loc = ? where dept_no = ?");
+        ps.setString(1, nom);
+        ps.setString(2, lo);
+        ps.setInt(3, num);
+
+        int af = ps.executeUpdate();
+
+        if (af > 0) {
+            mv.addObject("conf", "guay");
+        }
+
+        st = cn.createStatement();
+        rs = st.executeQuery("select * from dept");
+        
+        while (rs.next()){
+            Dept dept = new Dept();
+            dept.setDnumero(rs.getInt(1));
+            dept.setDnombre(rs.getString(2));
+            dept.setDlocalidad(rs.getString(3));
+            depts.add(dept);
+        }
+        
+        mv.addObject("depts", depts);
+        
+        return mv;
+
+    }
+
+    public ModelAndView eliminar(HttpServletRequest hsr, HttpServletResponse hsr1) throws Exception {
+        
+        ModelAndView mv = new ModelAndView();
+        ServletContext sc = hsr.getServletContext();
+        conectar(sc);
+
+        int num = Integer.parseInt(hsr.getParameter("numero"));
+        String nom = hsr.getParameter("nombre");
+        String lo = hsr.getParameter("localidad");
+
+        PreparedStatement ps;
+        Statement st;
+        ResultSet rs;
+        
+        List<Dept> depts = new ArrayList<>();
+        
+        ps = cn.prepareCall("delete from dept where dept_no = ?");
+        ps.setInt(1, num);
+        int af = ps.executeUpdate();
+       
+        if (af > 0) {
+            mv.addObject("conf", "guay");
+        }
+        
+        st = cn.createStatement();
+        rs = st.executeQuery("select * from dept");
+        
+        while (rs.next()){
+            Dept dept = new Dept();
+            dept.setDnumero(rs.getInt(1));
+            dept.setDnombre(rs.getString(2));
+            dept.setDlocalidad(rs.getString(3));
+            depts.add(dept);
+        }
+        
+        mv.addObject("depts", depts);
+        
+        return mv;
+        
+    }
+
+    private void conectar(ServletContext sc) {
+
+        try {
+            DriverManagerDataSource dataSource;
+            dataSource = (DriverManagerDataSource) Conexion.getBean("dataSource", sc);
+            this.cn = dataSource.getConnection();
+        } catch (SQLException ex) {
+            Logger.getLogger(ControladorDept.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
+}
