@@ -1,0 +1,66 @@
+VIEW.
+<HTML>
+    <HEAD>
+        <TITLE>Acción jsp:useBean</TITLE>
+    </HEAD>
+    <BODY bgcolor="navy" text="white">
+
+        <jsp:useBean id="miautor" scope="session" class="BeansPropios.Autor" />
+
+        <jsp:setProperty name="miautor"  property="nombre"  value = "Arturo"/>
+        <jsp:setProperty name="miautor"  property="apellidos" value = "Pérez Reverte"/>
+        <jsp:setProperty name="miautor"  property="nacionalidad" value = "Española"/>
+
+    <CENTER>
+        <H1>
+            <jsp:getProperty name="miautor" property="nombre" />
+            <jsp:getProperty name="miautor" property="apellidos" />
+        </H1>
+
+        <H2>
+            <jsp:getProperty name="miautor" property="nacionalidad"/>
+            <H2>
+
+                </CENTER>
+    </BODY>
+</HTML>
+
+BEAN.
+package BeansPropios;
+
+/**
+ *
+ * @author alumno
+ */
+public class Autor {
+    private String nombre;
+    private String apellidos;
+    private String nacionalidad;
+	
+	public Autor() { }
+	
+	public void setNombre( String a ) {
+		nombre = a;
+	}
+	
+	public void setApellidos( String a ) {
+		apellidos = a;
+	}
+	
+	public void setNacionalidad( String a ) {
+		nacionalidad = a;
+	}
+	
+	public String getNombre() {
+		return nombre;	
+	}
+	
+	public String getApellidos() {
+		return apellidos;	
+	}
+	
+	public String getNacionalidad() {
+		return nacionalidad;	
+	}
+
+}
