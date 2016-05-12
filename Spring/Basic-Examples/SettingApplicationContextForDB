@@ -1,0 +1,95 @@
+CONTROLLER.
+package controlador;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import modelo.Enfermo;
+import org.springframework.context.ApplicationContext;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.Controller;
+
+/**
+ *
+ * @author alumno
+ */
+public class ControladorEnfermo implements Controller {
+
+    Connection cn;
+
+    @Override
+    public ModelAndView handleRequest(HttpServletRequest hsr, HttpServletResponse hsr1) throws Exception {
+
+        ModelAndView mv = new ModelAndView();
+        List<Enfermo> enfermos = new ArrayList<Enfermo>();
+
+        DriverManagerDataSource dataSource;
+        dataSource = (DriverManagerDataSource) this.getBean("dataSource", hsr.getServletContext());
+        this.cn = dataSource.getConnection();
+
+        if (hsr.getParameter("insc") != null) {
+            int ins = Integer.parseInt(hsr.getParameter("insc"));
+            PreparedStatement ps;
+            ps = cn.prepareStatement("delete from enfermo where inscripcion = ?");
+            ps.setInt(1, ins);
+            ps.executeUpdate();
+        }
+
+        Statement st;
+        ResultSet rs;
+
+        st = cn.createStatement();
+        rs = st.executeQuery("select inscripcion, apellido, direccion, fecha_nac from enfermo");
+
+        while (rs.next()) {
+            Enfermo enfermo = new Enfermo();
+            enfermo.setIns(rs.getInt(1));
+            enfermo.setApe(rs.getString(2));
+            enfermo.setDir(rs.getString(3));
+            enfermo.setfa(rs.getString(4));
+            enfermos.add(enfermo);
+        }
+
+        mv.addObject("enfermos", enfermos);
+        return mv;
+    }
+
+    private Object getBean(String nombrebean, ServletContext servlet) {
+        ApplicationContext contexto = WebApplicationContextUtils.getRequiredWebApplicationContext(servlet);
+        Object beanobject = contexto.getBean(nombrebean);
+        return beanobject;
+    }
+
+}
+
+APPLICATIONCONTEXT.
+<?xml version='1.0' encoding='UTF-8' ?>
+<!-- was: <?xml version="1.0" encoding="UTF-8"?> -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
+
+    <!-- ADD PERSISTENCE SUPPORT HERE (jpa, hibernate, etc) -->
+
+    <bean id="dataSource"
+      class="org.springframework.jdbc.datasource.DriverManagerDataSource"
+      p:driverClassName="oracle.jdbc.OracleDriver"
+      p:url="jdbc:oracle:thin:@LOCALHOST:1521:XE"
+      p:username="SYSTEM"
+      p:password="javaoracle" />
+
+
+</beans>
