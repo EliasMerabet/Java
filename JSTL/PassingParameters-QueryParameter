@@ -1,0 +1,78 @@
+INDEX.
+<%@ taglib prefix="sql" uri="http://java.sun.com/jsp/jstl/sql" %>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<sql:setDataSource driver="oracle.jdbc.driver.OracleDriver" url="jdbc:oracle:thin:@localhost:1521:xe" user="system" password="javaoracle"/>
+<!DOCTYPE html>
+<html>
+    
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>JSP Page</title>
+    </head>
+    
+    <body>
+        <c:set var="br" value="<br>"/>
+        <c:set var="cont" value="0"/>
+
+        <sql:query var="equipos">
+            select equipo_cod, nombre, fundacion, presidente,foto_escudo from equipos
+        </sql:query>
+            ${'<table border=1>'}
+        <c:forEach items="${equipos.rows}" var="fila">
+            <c:if test="${cont == 0}">${'<tr>'}</c:if>
+            ${'<td><a href=equipo.jsp?nombre='}${fila.equipo_cod}${'><img border=1 src=Imagenes/'}${fila.foto_escudo}${' style=float:left;></a><div>'}
+            ${'Nombre: '}${fila.nombre}${br}
+            ${'Fundacion:  '}${fila.fundacion}${br}
+            ${'Presidente: '}${fila.presidente}${br}${'</td>'}<c:set var="cont" value="${cont = (cont+1)%3}"/>
+            <c:if test="${cont == 3}">${'</tr></div>'}${br}</c:if>
+
+        </c:forEach>
+        ${'</table>'}
+    </body>
+    
+</html>
+
+RESULT.
+<%@ taglib prefix="sql" uri="http://java.sun.com/jsp/jstl/sql" %>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<sql:setDataSource driver="oracle.jdbc.driver.OracleDriver" url="jdbc:oracle:thin:@localhost:1521:xe" user="system" password="javaoracle"/>
+<!DOCTYPE html>
+<html>
+    
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>JSP Page</title>
+    </head>
+    
+    <body>
+        <c:set var="info" value="${param.nombre}"/>
+        
+        <sql:query var="equipos">
+            select nombre,foto_equipo,foto_escudo from equipos where equipo_cod = ?
+            <sql:param value="${param.nombre}"/>
+        </sql:query>
+        
+        <c:forEach items="${equipos.rows}" var="fila">
+            ${'<div><center><h1>JUGADORES PRIMERA DIVISION</h1><br><img border=1 src=Imagenes/'}${fila.foto_escudo}
+            ${'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'}
+            ${'<img border=1 src=Imagenes/'}${fila.foto_equipo}${'><br>'}${fila.nombre}${'</center></div><br>'}
+        </c:forEach>
+        
+            
+        <sql:query var="consulta">
+            select nombre from jugadores where equipo_cod = ?
+            <sql:param value="${param.nombre}"/>
+        </sql:query>
+        
+        ${'<center><table border=1>'}
+        <c:set var="cont" value="false"/>
+        <c:forEach items="${consulta.rows}" var="fila">
+            <c:if test="${cont == false}">${'<tr>'}${'<td>'}${fila.nombre}${'</td>'}<c:set var="cont" value="true"/></c:if>
+            <c:if test="${cont == true}">${'<td>'}${fila.nombre}${'</td>'}${'</tr>'}<c:set var="cont" value="false"/></c:if>
+        </c:forEach>
+        ${'</center></table>'}
+    </body>
+    
+</html>
