@@ -1,0 +1,55 @@
+INDEX.
+<html>
+    
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    
+    <body>
+        <form action="recepcion.jsp">
+            Nombre: <input type="text" name="nombre">
+            Apellido: <input type="text" name="ape">
+            <input type="submit">
+        </form>
+    </body>
+    
+</html>
+
+RECEPTION (GET).
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+    
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>JSP Page</title>
+        <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+    </head>
+    
+    <body>
+        <c:set var="nombre" value="${param.nombre}" scope="session"/>
+        <c:set var="apellido" value="${param.ape}" scope="session"/>
+        <a href="confirmacion.jsp" >Confirmar</a>
+    </body>
+    
+</html>
+
+RECEPTION (POST).
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+    
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>JSP Page</title>
+        <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+    </head>
+    
+    <body>
+        <c:out value="${nombre}"></c:out>
+        <c:out value="${apellido}"></c:out>
+    </body>
+    
+</html>
