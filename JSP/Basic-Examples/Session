@@ -1,0 +1,80 @@
+<%@page import="java.sql.PreparedStatement"%>
+<%@page import="java.sql.ResultSet"%>
+<%@page import="java.sql.Statement"%>
+<%@page import="java.sql.Connection"%>
+<%@page import="java.sql.DriverManager"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+    
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>JSP Page</title>
+    </head>
+    
+    <body>
+    <center><h1>JUBILAR EMPLEADOS</h1></center>
+    <br><br>
+    <%
+
+    %>
+    <form name='form1' action='ahorro.jsp'>
+        <input type="submit" value='Suma Ahorro'>
+    </form>
+
+        <form name='form2' action='JubilarEmpleados.jsp'>
+        <%
+            String html = "";
+            int salarioT = 0;
+            
+            int posicion;
+            if (request.getParameter("posicion") == null){
+                posicion = 1;
+            }else{
+                posicion = Integer.parseInt(request.getParameter("posicion"));
+            }
+            
+            try{
+            DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
+            Connection cn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "system", "javaoracle");
+            
+            Statement st = cn.createStatement();
+            ResultSet rs = st.executeQuery("select count(*) from emp");
+            rs.next();
+            int numeroregistros = rs.getInt(1);
+            rs.close();
+            
+            PreparedStatement st1 = cn.prepareStatement("select apellido, salario from (select e.*, rownum rnum from (select apellido,"
+                    + "salario from emp order by apellido) e where rownum < " + (posicion+3) + ") where rnum >= " + posicion);
+            ResultSet rs1 = st1.executeQuery();
+            
+            while (rs1.next()){
+                html += "<br>" + "<input type='checkbox' name='check' value='" + rs1.getInt(2) + "'>" + rs1.getString(1);
+            }
+            html += "<br><br>";
+            int numpagina = 1;
+            for (int i = 0; i < numeroregistros; i+=3){
+                int aux = i+1;
+                html += "<a href='JubilarEmpleados.jsp?posicion=" + aux + "'>" + numpagina + "</a>&nbsp;";
+                numpagina++;
+            }
+            
+            String[] valores = request.getParameterValues("check");
+            if (request.getParameterValues("check") != null){
+            for (int i = 0; i < valores.length; i++){
+                    salarioT += Integer.parseInt(valores[i]);
+            }
+            }
+            session.setAttribute("ahorro", salarioT);
+        %>
+        <%=html%>
+        <br><br>
+        <input type="submit" value='Añadir'>
+        <br>
+        </form>
+        <% }catch(Exception ex){%>
+        <h1>ERROR <%=ex.toString()%></h1>
+        <%}%>
+    </body>
+    
+</html>
