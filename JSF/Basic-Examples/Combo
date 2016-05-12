@@ -1,0 +1,56 @@
+VIEW.
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core">
+    <h:head>
+        <title>Ejemplo Combo Cambia Texto</title>
+    </h:head>
+    <h:body>
+        <h:form>
+            Opciones: 
+            <h:selectOneMenu value="#{FormBean.elementoseleccionado}">
+                <f:selectItems value="#{FormBean.elementos}" />
+            </h:selectOneMenu><br/>
+            <h:commandButton value="Mostrar" />
+            <br/>
+            Opción seleccionada: <h:outputText id="lblresultado" value="#{FormBean.elementoseleccionado}" />
+        </h:form>
+    </h:body>
+</html>
+
+CONTROLLER.
+package pqmanagedbeans;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.RequestScoped;
+import javax.faces.model.SelectItem;
+
+@ManagedBean(name = "FormBean")
+@RequestScoped
+public class FormBean {
+
+    private SelectItem[] elementos;
+
+    private String elementoseleccionado;
+
+    public FormBean() {
+        elementos = new SelectItem[]{new SelectItem("Valor 01", "Elemento 1"),
+        new SelectItem("Valor 02", "Elemento 2"),
+        new SelectItem("Valor 03", "Elemento 3")};
+    }
+
+    public SelectItem[] getelementos() {
+        return elementos;
+    }
+
+    public String getelementoseleccionado() {
+        return elementoseleccionado;
+    }
+
+    public void setelementoseleccionado(String elementoseleccionado) {
+        this.elementoseleccionado = elementoseleccionado;
+    }       
+
+}
