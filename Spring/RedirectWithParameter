@@ -1,0 +1,23 @@
+    public ModelAndView eliminar(HttpServletRequest hsr, HttpServletResponse hsr1) throws Exception {
+
+        Map model = new HashMap();
+        model.put("accion", "inicio");
+        ModelAndView mv = new ModelAndView("redirect:bajaSocio.htm", model);
+
+        int pos = 1;
+
+        if (hsr.getParameter("posicion") != null) {
+            pos = Integer.parseInt(hsr.getParameter("posicion"));
+        }
+
+        if (hsr.getParameterValues("eliminar") == null) {
+            return mv;
+        }
+
+        String[] socioselim = hsr.getParameterValues("eliminar");
+
+        borrarSocios(socioselim);
+
+        mv.addObject("posicion", pos);
+        return mv;
+    }
