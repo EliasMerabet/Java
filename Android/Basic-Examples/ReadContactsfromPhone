@@ -1,0 +1,72 @@
+package android.android9_leercontactos;
+
+import android.database.Cursor;
+import android.provider.ContactsContract;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+
+public class MainActivity extends AppCompatActivity implements View.OnClickListener
+{
+
+    private Button btnaccion;
+    private TextView txtcontactos;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        btnaccion = (Button) findViewById(R.id.btnleer);
+        txtcontactos = (TextView) findViewById(R.id.txtregistro);
+
+        btnaccion.setOnClickListener(this);
+    }
+
+    public void onClick(View v) {
+        if (v == btnaccion) {
+            btnAccionClick();
+        }
+    }
+
+    private void btnAccionClick() {
+        String sColumnas[] = { ContactsContract.Contacts.DISPLAY_NAME,
+                ContactsContract.Contacts.TIMES_CONTACTED };
+        Cursor cursorContactos = getContentResolver().query(
+                ContactsContract.Contacts.CONTENT_URI, sColumnas, null, null,
+                ContactsContract.Contacts.DISPLAY_NAME);
+
+
+/**** ARGUMENTOS:
+ sColumnas: columnas_a_seleccionar,
+ null: número de filas a devolver (todas si NULL)
+ null: Clausulas WHERE (NULL ninguna)
+ ContactsContract.Contacts.DISPLAY_NAME): //Ordenación
+ *****/
+
+        StringBuffer datos = new StringBuffer();
+        cursorContactos.moveToFirst();
+        while (!cursorContactos.isAfterLast()) {
+            String nombrecontacto = cursorContactos.getString(cursorContactos
+                    .getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME));
+            int numerollamadas = cursorContactos.getInt(cursorContactos
+                    .getColumnIndexOrThrow(ContactsContract.Contacts.TIMES_CONTACTED));
+
+            datos.append(nombrecontacto);
+            datos.append(", Número de llamadas -> ");
+            datos.append(numerollamadas);
+            datos.append("\n");
+
+            cursorContactos.moveToNext();
+        }
+        cursorContactos.close();
+        txtcontactos.setText(datos);
+    }
+}
+
+ANDROIDMANIFEST.
+<uses-permission android:name="android.permission.READ_CONTACTS"/>
