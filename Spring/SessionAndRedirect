@@ -1,0 +1,11 @@
+    public ModelAndView deslogarse(HttpServletRequest hsr, HttpServletResponse hsr1) throws Exception {
+
+        ModelAndView mv = new ModelAndView();
+
+        HttpSession sesion = hsr.getSession();
+        sesion.removeAttribute("user");
+        sesion.removeAttribute("tipo_user");
+
+        hsr1.sendRedirect("http://localhost:8084/GestionVideoclub1/faces/index.jsp");
+        return mv;
+    }
