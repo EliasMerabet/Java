@@ -1,0 +1,352 @@
+INTERFACE EMPLOYEE.
+package videoclub.empleado;
+
+import java.io.Serializable;
+
+/**
+ * Interface empleado. Con los metodos sin implementar y que obligara a que sean
+ * implementados en las clases derivadas. (getDni, verPersona, verEmpleado).
+ * 
+ * @author Elias Merabet
+ *
+ */
+
+public interface Empleado extends Serializable {
+	/**
+	 * Devuelve el nivel de responsabilidad del objeto.
+	 * 
+	 * @return nivel de responsabilidad del objeto
+	 */
+	public int getNivelResponsabilidad();
+
+	/**
+	 * Devuelve el atributo dni.
+	 * 
+	 * @return devuelve el atributo dni.
+	 */
+	public int getDni();
+
+	/**
+	 * Devuelve el atributo nombre.
+	 * 
+	 * @return nombre del objeto.
+	 */
+	public String getNombre();
+
+	/**
+	 * Devuelve el atributo id.
+	 * 
+	 * @return id del objeto.
+	 */
+	public int getId();
+
+	/**
+	 * Devuelve la informacion del objeto como empleado.
+	 * 
+	 * @return informacion del objeto como empleado.
+	 */
+	public String verEmpleado();
+
+	/**
+	 * Devuelve la informacion del objeto como persona.
+	 * 
+	 * @return informacion del objeto como persona.
+	 */
+	public String verPersona();
+}
+
+CLASS BOSS.
+package videoclub.empleado;
+
+import videoclub.persona.Persona;
+
+/**
+ * Esta clase implementa las interfaces Empleado y Persona.
+ * 
+ * @author Elias Merabet
+ */
+
+public class Jefe implements Empleado, Persona {
+
+	private static final long serialVersionUID = 4017456095397605528L;
+	private String nombre;
+	private int dni;
+	private int idJefe;
+	// Las dos siguientes variables determinaran el numero maximo de jefes para
+	// todas
+	// las instancias de la clase
+	private static int numJefes = 0;
+	private static final int numMaxJefes = 2;
+	// Los jefes siempre tienen un nivel de responsabilidad 4.
+	// Por lo tanto lo defino como constante.
+	private final int nivelResponsabilidad = 4;
+
+	/**
+	 * El constructor jefe tiene tres parametros y modificara la variable de
+	 * clase numJefes.
+	 * 
+	 * @param nombre
+	 *            nombre del jefe.
+	 * @param dni
+	 *            dni del jefe.
+	 * @param idJefe
+	 *            id del jefe.
+	 */
+
+	public Jefe(String nombre, int dni, int idJefe) {
+		this.nombre = nombre;
+		this.dni = dni;
+		Jefe.numJefes++;
+		this.idJefe = idJefe;
+	}
+
+	/**
+	 * Devuelve el atributo nombre.
+	 * 
+	 * @return nombre nombre del objeto.
+	 */
+	public String getNombre() {
+		return nombre;
+	}
+
+	/**
+	 * Asigna un nombre.
+	 * 
+	 * @param nombre
+	 *            nombre del objeto.
+	 */
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+
+	/**
+	 * Devuelve el identificador del jefe.
+	 * 
+	 * @return id identificador del jefe.
+	 */
+	public int getId() {
+		return idJefe;
+	}
+
+	/**
+	 * Devuelve la variable estatica de la clase numJefes, el numero de jefes de
+	 * todos los objetos de la clase.
+	 * 
+	 * @return numJefes numero de jefes para todos los objetos de la clase.
+	 */
+	public static int getNumJefes() {
+		return numJefes;
+	}
+
+	// No creo set para numJefes, quiero solo modificarlo internamente cuando se
+	// crea una instancia de la clase (a traves del constructor).
+	/**
+	 * Devuelve la constante de la clase numMaxJefes.
+	 * 
+	 * @return numMaxJefes numero maximo de jefes, es una constante, para todos
+	 *         los objetos de la clase.
+	 */
+	public static int getNummaxJefes() {
+		return numMaxJefes;
+	}
+
+	/**
+	 * Devuelve el atributo nivel de responsabilidad del objeto.
+	 * 
+	 * @return nivelResponsabilidad nivel de responsabilidad del objeto.
+	 */
+	public int getNivelResponsabilidad() {
+		return nivelResponsabilidad;
+	}
+
+	/**
+	 * Devuelve el atributo dni.
+	 * 
+	 * @return dni dni del objeto.
+	 */
+	public int getDni() {
+		return dni;
+	}
+
+	/**
+	 * Fija el atributo dni.
+	 * 
+	 * @param dni
+	 *            dni del objeto.
+	 */
+	public void setDni(int dni) {
+		this.dni = dni;
+	}
+
+	/**
+	 * Devuelve un string con la informacion de los atributos del objeto en
+	 * funcion de su interfaz Empleado
+	 * 
+	 * @return String informacion del objeto desde la perspectiva empleado.
+	 */
+	@Override
+	public String verEmpleado() {
+		// Devuelve la informacion del jefe como Empleado.
+		return "El identificador de este jefe es " + this.idJefe + ", con un nivel de responsabilidad "
+				+ this.nivelResponsabilidad;
+	}
+
+	/**
+	 * Devuelve un string con la informacion de los atributos del objeto en
+	 * funcion de su interfaz Persona.
+	 * 
+	 * @return String informacion del objeto desde la perspectiva persona.
+	 */
+	@Override
+	public String verPersona() {
+		// Devuelve la informacion del jefe como Persona.
+		return "El nombre de esta persona es " + this.nombre + " con DNI " + this.dni;
+	}
+}
+
+CLASS WORKER.
+package videoclub.empleado;
+
+import videoclub.persona.Persona;
+
+/**
+ * Esta clase implementa las interfaces Empleado y Persona.
+ * 
+ * @author Elias Merabet
+ *
+ */
+public class Currito implements Persona, Empleado {
+
+	private static final long serialVersionUID = -536545552892605424L;
+	private String nombre;
+	private int dni;
+	private int idCurrito;
+	// Las dos siguientes variables determinaran el numero maximo de curritos
+	// para todas
+	// las instancias de la clase
+	private static int numCurritos = 0;
+	private static final int numMaxCurritos = 6;
+	// Los curritos siempre tienen un nivel de responsabilidad 0.
+	// Por lo tanto lo defino como constante.
+	private final int nivelResponsabilidad = 0;
+
+	/**
+	 * El constructor currito tiene tres parametros y modificara la variable de
+	 * clase numJefes.
+	 * 
+	 * @param nombre
+	 *            nombre del currito.
+	 * @param dni
+	 *            dni del currito.
+	 * @param idCurrito
+	 *            id del currito.
+	 */
+	public Currito(String nombre, int dni, int idCurrito) {
+		this.nombre = nombre;
+		Currito.numCurritos++;
+		this.idCurrito = idCurrito;
+		this.dni = dni;
+	}
+
+	/**
+	 * Devuelve el atributo nombre.
+	 * 
+	 * @return nombre nombre del objeto
+	 */
+	public String getNombre() {
+		return nombre;
+	}
+
+	/**
+	 * Asigna un nombre.
+	 * 
+	 * @param nombre
+	 *            nombre del objeto
+	 */
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+
+	/**
+	 * Devuelve el identificador del currito.
+	 * 
+	 * @return idCurrito identificador del objeto
+	 */
+	public int getId() {
+		return idCurrito;
+	}
+
+	/**
+	 * Devuelve la variable estatica de la clase numCurritos.
+	 * 
+	 * @return numCurritos el numero de curritos de todos los objetos de la
+	 *         clase.
+	 */
+	public static int getNumCurritos() {
+		return numCurritos;
+	}
+
+	/**
+	 * Devuelve la constante de la clase numMaxCurritos.
+	 * 
+	 * @return numMaxCurritos la constante de la clase numMaxCurritos.
+	 */
+	public static int getNumMaxCurritos() {
+		return numMaxCurritos;
+	}
+
+	/**
+	 * Devuelve el atributo nivel de responsabilidad del objeto.
+	 * 
+	 * @return nivelResponsabilidad la constante de la instancia
+	 *         nivelResponsabilidad.
+	 */
+	public int getNivelResponsabilidad() {
+		return nivelResponsabilidad;
+	}
+
+	/**
+	 * Devuelve el atributo dni.
+	 * 
+	 * @return dni
+	 */
+	public int getDni() {
+		return dni;
+	}
+
+	/**
+	 * Fija el atributo dni.
+	 * 
+	 * @param dni
+	 *            dni del objeto
+	 */
+	public void setDni(int dni) {
+		this.dni = dni;
+	}
+
+	/**
+	 * Devuelve un string con la informacion de los atributos del objeto en
+	 * funcion de su interfaz Empleado
+	 * 
+	 * @return String la informacion del objeto desde la perspectiva de
+	 *         empleado.
+	 */
+	@Override
+	public String verEmpleado() {
+		// Devuelve la informacion del jefe como Empleado.
+		return "El identificador de este currito es " + this.idCurrito + ", con un nivel de responsabilidad "
+				+ this.nivelResponsabilidad;
+	}
+
+	/**
+	 * Devuelve un string con la informacion de los atributos del objeto en
+	 * funcion de su interfaz Persona.
+	 * 
+	 * @return String la informacion del objeto desde la perspectiva de persona.
+	 */
+	@Override
+	public String verPersona() {
+		// Devuelve la informacion del jefe como Persona.
+		return "El nombre de esta persona es " + this.nombre + ", con Dni " + this.dni;
+	}
+}
