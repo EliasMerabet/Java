@@ -1,0 +1,203 @@
+VIEW.
+            <header>
+                <div class="row-top">
+                    <div class="main">
+                        <div class="wrapper">
+                            <h1><img src="images/9.png" alt="Gestion Integral Videoclub Logo" style="width: 80px; margin-left: 0px;" />&nbsp;&nbsp;&nbsp;<a href="index.html">Gestion <span>Integral </span></a></h1>
+                            <nav>
+                                <ul class="menu">
+                                    <li><a href="faces/portadaSocios.jsp">Portada</a></li>
+                                    <li><a href="faces/verAlimentos.jsp">Ver Alimentos</a></li>
+                                    <li><a href="verCartelera.jsp">Ver Cartelera</a></li>
+                                    <li><a href="faces/verCarrito.jsp">Ver Carrito</a></li>
+                                    <li><a href="faces/verAlquiladas.jsp">Ver Alquiladas</a></li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+                <div class="row-bot">
+                    <div class="row-bot-bg">
+                        <div class="main">
+                            <h2>Ver <span>Alimentos</span></h2>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!--==============================content================================-->
+            <section id="content"><div class="ic">More Website Templates @ TemplateMonster.com - January 23, 2012!</div>
+                <div class="main">
+                    <div class="wrapper">
+
+                        <h3 class="p1">Alimentos</h3>
+                        <div class="div-tabla" style="box-shadow: 10px 10px 5px #808080;">
+                            <h:form styleClass="tabla">
+
+                                <h:dataTable value="#{BeanVerAlimentos.alimentosUsuario}" var="alimento" styleClass="tabla" style="box-shadow: 10px 10px 5px #808080;"> 
+
+                                    <h:column>
+                                        <f:facet name="header"><h:outputText value="NOMBRE: " style="width: 150px;"/> </f:facet>
+                                        <h:inputHidden id="codigoAlimento" value="#{alimento.codigoAlimento}" />
+                                        <h:outputText value="#{alimento.nombre}" style="width: 150px;"/> 
+                                    </h:column>
+
+                                    <h:column>
+                                        <f:facet name="header"><h:outputText value="CATEGORIA: " style="width: 150px;"/> </f:facet>
+                                        <h:outputText value="#{alimento.categoria}" style="width: 150px;"/> 
+                                    </h:column>
+
+                                    <h:column>
+                                        <f:facet name="header"><h:outputText value="PRECIO VENTA: " style="width: 150px;"/> </f:facet>
+                                        <h:outputText id="precioVenta" value="#{alimento.precioVenta}" style="width: 150px;"/> 
+                                    </h:column>
+
+                                    <h:column>
+                                        <f:facet name="header"><h:outputText value="CANTIDAD: " style="width: 150px;"/> </f:facet>
+                                        <h:inputText id="can" value="#{alimento.cantidadComprar}" style="width: 40px;">
+                                            <f:validateLongRange minimum="0" maximum="10"/>
+                                        </h:inputText>
+                                    </h:column>
+
+                                </h:dataTable><br>
+
+                                <c:if test="${BeanVerAlimentos.mensaje != null}">
+                                    <h:outputText style="border:2px inset black; background-color: white; padding: 5px 5px 5px 5px;" value="#{BeanVerAlimentos.mensaje}" /> <br><br>
+                                </c:if>
+
+                                <h:commandButton value="Añadir a Carrito" type="submit" action="#{BeanVerAlimentos.anadir}" style="box-shadow: 10px 10px 5px #808080;"/> 
+
+                            </h:form>
+
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+            
+CONTROLLER.
+package beansJSF;
+
+import HelperHibernate.AlimentosHelper;
+import clasesGestionVideoclub.Alimentos;
+import clasesGestionVideoclub.HibernateUtil;
+import java.util.ArrayList;
+import java.util.Map;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import utils.Alimento;
+import utils.AlimentoCarrito;
+import utils.Productos;
+
+/**
+ *
+ * @author alumno
+ */
+public class BeanVerAlimentos {
+
+    private ArrayList<Alimentos> alimentos;
+    private ArrayList<Alimento> alimentosUsuario;
+    private String mensaje;
+
+    public void anadir() {
+
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        Map<String, Object> sessionMap = externalContext.getSessionMap();
+
+        ArrayList<Productos> carrito = new ArrayList<>();
+
+        //NO TIENE SENTIDO METERLO EN UN SUBPROCEDURE.
+        if (sessionMap.get("carrito") == null) {
+            for (Alimento alimentosUsuario1 : alimentosUsuario) {
+                if (alimentosUsuario1.getCantidadComprar() > 0) {
+                    Productos a = new AlimentoCarrito();
+                    a.setCod(alimentosUsuario1.getCodigoAlimento());
+                    a.setNom(alimentosUsuario1.getNombre());
+                    a.setPrecioVenta(alimentosUsuario1.getPrecioVenta());
+                    a.setCantidad(alimentosUsuario1.getCantidadComprar());
+                    carrito.add(a);
+                }
+            }
+        } else {
+            carrito = (ArrayList<Productos>) sessionMap.get("carrito");
+            for (Alimento alimentosUsuario1 : alimentosUsuario) {
+                if (alimentosUsuario1.getCantidadComprar() > 0) {
+                    boolean encontrado = false;
+
+                    for (Productos p : carrito) {
+                        if ((p instanceof AlimentoCarrito) && (p.getCod() == alimentosUsuario1.getCodigoAlimento())) {
+                            int pos = carrito.indexOf(p);
+                            p.setCantidad(p.getCantidad() + alimentosUsuario1.getCantidadComprar());
+                            carrito.set(pos, p);
+                            encontrado = true;
+                            break;
+                        }
+                    }
+
+                    if (!encontrado) {
+                        Productos a = new AlimentoCarrito();
+                        a.setCod(alimentosUsuario1.getCodigoAlimento());
+                        a.setNom(alimentosUsuario1.getNombre());
+                        a.setPrecioVenta(alimentosUsuario1.getPrecioVenta());
+                        a.setCantidad(alimentosUsuario1.getCantidadComprar());
+                        carrito.add(a);
+                    }
+                } else {
+
+                }
+            }
+        }
+
+        this.mensaje = "Alimentos añadidos correctamente...";
+        sessionMap.put("carrito", carrito);
+    }
+
+    public BeanVerAlimentos() {
+
+        AlimentosHelper ah = new AlimentosHelper();
+        
+        this.setAlimentos(ah.obtenerAlimentos());
+
+        this.alimentosUsuario = new ArrayList<>();
+
+        for (int i = 0; i < this.alimentos.size(); i++) {
+            Alimento alimentoUsuario = new Alimento();
+            alimentoUsuario.setCodigoAlimento(this.alimentos.get(i).getCodigoAlimento());
+            alimentoUsuario.setNombre(this.alimentos.get(i).getNombre());
+            alimentoUsuario.setPrecio(this.alimentos.get(i).getPrecio());
+            alimentoUsuario.setPrecioVenta(this.alimentos.get(i).getPrecioVenta());
+            alimentoUsuario.setCategoria(this.alimentos.get(i).getCategoria());
+            alimentoUsuario.setCantidadStock(this.alimentos.get(i).getCantidad());
+            alimentoUsuario.setCantidadComprar(0);
+            this.alimentosUsuario.add(alimentoUsuario);
+        }
+
+    }
+
+    public ArrayList<Alimentos> getAlimentos() {
+        return alimentos;
+    }
+
+    public void setAlimentos(ArrayList<Alimentos> alimentos) {
+        this.alimentos = alimentos;
+    }
+
+    public String getMensaje() {
+        return mensaje;
+    }
+
+    public void setMensaje(String mensaje) {
+        this.mensaje = mensaje;
+    }
+
+    public ArrayList<Alimento> getAlimentosUsuario() {
+        return alimentosUsuario;
+    }
+
+    public void setAlimentosUsuario(ArrayList<Alimento> alimentosUsuario) {
+        this.alimentosUsuario = alimentosUsuario;
+    }
+
+}
