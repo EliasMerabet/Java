@@ -1,0 +1,140 @@
+VIEW.
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core">
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        <h:form>
+            <h:panelGrid columns="3">
+                
+                 <h:outputLabel value="Id Plantilla" for="txtidplantilla"/>
+                 <h:inputText id="txtidplantilla" value="#{PlantillaBean.idplantilla}"
+                             validatorMessage="El ID de plantilla debe ser de 4 dígitos"
+                             required="true">
+                     <f:validateLength minimum="4" maximum="4"/>
+                </h:inputText>
+                <h:message for="txtidplantilla" errorStyle="color: red" infoStyle="color: green"/>               
+                                             
+                <h:outputLabel value="Apellido:" for="txtapellido"/>
+                <h:inputText id="txtapellido" value="#{PlantillaBean.apellido}"
+                             validatorMessage="El campo debe empezar con mayúscula y contener sólo letras">
+                    <f:validateRegex pattern="[A-Z]{1}[A-Za-z]{1,}"/>
+                </h:inputText>
+                <h:message for="txtapellido" errorStyle="color: red" infoStyle="color: green"/>
+                                
+                <h:outputLabel value="Turno" for="txtturno"/>
+                <h:inputText id="txtturno" value="#{PlantillaBean.turno}"
+                             validator="#{PlantillaBean.validarTurno}"/>                    
+                <h:message for="txtturno" errorStyle="color: red" infoStyle="color: green"/>
+
+                <h:outputLabel value="Salario:" for="txtsalario"/>                
+                <h:inputText id="txtsalario" value="#{PlantillaBean.salario}"
+                             validatorMessage="El salario debe estar entre 200000 y 350000">
+                    <f:validateLongRange  minimum="200000"  maximum="350000"/>
+                </h:inputText>
+                <h:message for="txtsalario" errorStyle="color: red" infoStyle="color: green"/>
+                <h:commandLink action="#{PlantillaBean.modificarSalario()}" value="Modificar plantilla"/>
+                <h:outputLabel value="#{PlantillaBean.mensaje}"/>
+            </h:panelGrid>
+        </h:form>
+
+    </h:body>
+</html>
+
+CONTROLLER.
+package pqmanagedbeans;
+
+//import com.microsoft.sqlserver.jdbc.SQLServerDriver;
+import java.sql.*;
+import javax.faces.application.FacesMessage;
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
+import javax.faces.validator.ValidatorException;
+
+public class PlantillaBean {
+
+    private int idplantilla;
+    private String apellido;
+    private String turno;
+    private int salario;
+    private String mensaje;
+
+    Connection cn = null;
+
+    public void conectarSQL() throws SQLException {
+        DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
+        cn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "system", "javaoracle");
+    }
+
+    public String modificarSalario() {
+        try {
+            this.conectarSQL();
+            String consulta = "UPDATE PLANTILLA SET APELLIDO=? "
+                    + ",TURNO=?,SALARIO=SALARIO+? WHERE EMPLEADO_NO=?";
+            PreparedStatement pst = this.cn.prepareStatement(consulta);
+            pst.setString(1, apellido);
+            pst.setString(2, turno);
+            pst.setInt(3, salario);
+            pst.setInt(4, idplantilla);
+
+            int resultado = pst.executeUpdate();
+            this.mensaje = "Registros modificados: " + resultado;
+        } catch (Exception ex) {
+            this.mensaje = "Excepción modificando salario: " + ex;
+        }
+        return null;
+    }
+
+    public void validarTurno(FacesContext contexto, UIComponent componente, Object obj) throws ValidatorException {
+        String t = obj.toString();
+        if (t.equalsIgnoreCase("T") == false
+                && t.equalsIgnoreCase("N") == false
+                && t.equalsIgnoreCase("M") == false) {
+            throw new ValidatorException(new FacesMessage("El turno sólo puede ser M, N, o T"));
+        }
+    }
+
+    public String getApellido() {
+        return apellido;
+    }
+
+    public void setApellido(String apellido) {
+        this.apellido = apellido;
+    }
+
+    public int getSalario() {
+        return salario;
+    }
+
+    public void setSalario(int salario) {
+        this.salario = salario;
+    }
+
+    public String getMensaje() {
+        return mensaje;
+    }
+
+    public void setMensaje(String mensaje) {
+        this.mensaje = mensaje;
+    }
+
+    public int getIdplantilla() {
+        return idplantilla;
+    }
+
+    public void setIdplantilla(int idplantilla) {
+        this.idplantilla = idplantilla;
+    }
+
+    public String getTurno() {
+        return turno;
+    }
+
+    public void setTurno(String turno) {
+        this.turno = turno;
+    }
+}
