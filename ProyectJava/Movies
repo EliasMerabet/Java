@@ -1,0 +1,382 @@
+ABSTRACT CLASS MOVIES.
+//Encapsulo todo en un paquete, lo que me permitira usar las diferentes clases
+//que lo componen (dentro del paquete o desde la clase que lo importe).
+package videoclub.pelicula;
+
+import videoclub.persona.Cliente;
+
+/**
+ * Esta clase abstracta servira de raiz para las clases peliculas segun su
+ * genero.
+ * 
+ * @author Elias Merabet
+ *
+ */
+// Creo una clase abstracta que sirva de base para las clases resultantes de
+// esta,
+// en funcion de su genero.
+public abstract class Pelicula {
+
+	private String titulo;
+	private int duracion;
+	private String sinopsis;
+	// Utilizo agregacion, al usar como atributo de la clase otra case.
+	// Con lo que tengo jerarquizacion(tambien disponible mediante herencia). Ya
+	// que
+	// la clase Pelicula, dispondra de los atributos y metodos de la clase
+	// Cliente
+	// a traves de este miembro.
+	// Sirve para asociar a una pelicula un cliente, esto indicara que la
+	// pelicula ha sido
+	// alquilada. Si este atributo esta a null, la pelicula esta disponible.
+	private Cliente cli;
+
+	// Sobrecarga de metodos. Me permite crear un mismo metodo que realizara una
+	// funcion
+	// u otra dependiendo de los parametros que le pasemos en la llamada.
+
+	// Al ser metodo abstracto se implementara en la clase derivada.
+	// Si la clase derivada no los implementa, debera declararlos abstractos a
+	// su vez,
+	// con lo que esa clase se volvera abstracta a su vez.
+	/**
+	 * Devuelve la informacion de la intensidad en funcion del atributo
+	 * especifico de cada clase que hereda.
+	 * 
+	 * @return informacion de la intensidad especifica de cada tipo de pelicula.
+	 */
+	public abstract String intensidad();
+
+	/**
+	 * Devuelve el precio del objeto en funcion de la clase en la que se
+	 * encuentre.
+	 * 
+	 * @return precio del objeto.
+	 */
+	public abstract float precio();
+
+	/**
+	 * Constructor con parametros titulo, duracion, sinopsis. El atributo, que
+	 * es una clase cli (de cliente), se dejara a null.
+	 * 
+	 * @param titulo
+	 *            titulo de la pelicula.
+	 * @param duracion
+	 *            duracion de la pelicula.
+	 * @param sinopsis
+	 *            sinopsis de la pelicula.s
+	 */
+	public Pelicula(String titulo, int duracion, String sinopsis) {
+		this.titulo = titulo;
+		this.duracion = duracion;
+		this.sinopsis = sinopsis;
+		this.cli = null;
+	}
+
+	/**
+	 * Devuelve el atributo duracion
+	 * 
+	 * @return duracion duracion del objeto.
+	 */
+	public int getDuracion() {
+		return duracion;
+	}
+
+	/**
+	 * Fija el atributo duracion.
+	 * 
+	 * @param duracion
+	 *            duracion del objeto.
+	 */
+	public void setDuracion(int duracion) {
+		this.duracion = duracion;
+	}
+
+	/**
+	 * Devuelve el atributo sinopsis.
+	 * 
+	 * @return sinopsis sinopsis del objeto.
+	 */
+	public String getSinopsis() {
+		return sinopsis;
+	}
+
+	/**
+	 * Fija el atributo sinopsis.
+	 * 
+	 * @param sinopsis
+	 *            sinopsis del objeto.
+	 */
+	public void setSinopsis(String sinopsis) {
+		this.sinopsis = sinopsis;
+	}
+
+	/**
+	 * Devuelve el atributo titulo.
+	 * 
+	 * @return titulo titulo del objeto.
+	 */
+	public String getTitulo() {
+		return titulo;
+	}
+
+	/**
+	 * Fija el atributo titulo.
+	 * 
+	 * @param titulo
+	 *            titulo del objeto.
+	 */
+	public void setTitulo(String titulo) {
+		this.titulo = titulo;
+	}
+
+	/**
+	 * Devuelve el atributo cliente
+	 * 
+	 * @return Cliente cliente del objeto.
+	 */
+	public Cliente getCli() {
+		return cli;
+	}
+
+	/**
+	 * Fija el atributo cliente
+	 * 
+	 * @param cli
+	 *            cliente del objeto.
+	 */
+	public void setCli(Cliente cli) {
+		this.cli = cli;
+	}
+
+	// Sobreescribo el metodo toString para que se adapte a mis necesidades.
+	// En cualquier caso es una buena practica de programacion.
+	/**
+	 * Devuelve la informacion de la instancia de la clase en un string.
+	 * 
+	 * @return informacion de la instancia de la clase.
+	 */
+	public String toString() {
+		String inf = "La pelicula " + this.titulo + ", la duracion de la pelicula es " + this.duracion + " min."
+				+ " y trata sobre: " + this.sinopsis;
+		if (this.cli == null) {
+			inf += " EN ESTE MOMENTO SE ENCUENTRA DISPONIBLE.";
+		} else {
+			inf += " EN ESTE MOMENTO SE ENCUENTRA ALQUILADA POR " + cli.verPersona();
+		}
+		return inf;
+	}
+}
+
+
+CLASS LOVE.
+package videoclub.pelicula;
+
+/**
+ * Clase que hereda de pelicula y le añade un atributo nivelLloro.
+ * 
+ * @author Elias Merabet
+ *
+ */
+public class Amor extends Pelicula {
+	private int nivelLLoro;
+
+	/**
+	 * Constructor que llama a la clase padre.
+	 * 
+	 * @param titulo
+	 *            titulo de la pelicula de amor.
+	 * @param duracion
+	 *            duracion de la pelicula de amor.
+	 * @param sinopsis
+	 *            sinopsis de la pelicula de amor.
+	 * @param nLLoro
+	 *            nivel de lloro de la pelicula de amor.
+	 */
+	public Amor(String titulo, int duracion, String sinopsis, int nLLoro) {
+		super(titulo, duracion, sinopsis);
+		this.nivelLLoro = nLLoro;
+	}
+
+	/**
+	 * Devuelve el atributo nivelLloro
+	 * 
+	 * @return nivelLLoro nivel de lloro del objeto.
+	 */
+	public int getNivelLLoro() {
+		return nivelLLoro;
+	}
+
+	/**
+	 * Asigna el atributo nivelLloro
+	 * 
+	 * @param nivelLLoro
+	 *            nivel de lloro del objeto.
+	 */
+	public void setNivelLLoro(int nivelLLoro) {
+		this.nivelLLoro = nivelLLoro;
+	}
+
+	/**
+	 * Devuelve el precio de la instancia.
+	 * 
+	 * @return precio del objeto.
+	 */
+	@Override
+	public float precio() {
+		// El precio de las peliculas de amor es de 3 euros.
+		return 3.00f;
+	}
+
+	/**
+	 * Devuelve la informacion del atributo nivelLloro en un String con el
+	 * formato que queriamos.
+	 * 
+	 * @return informacion del atributo nivelLloro.
+	 */
+	public String intensidad() {
+		return this.nivelLLoro + " de nivel de lloro.";
+	}
+}
+
+CLASS SCIFI.
+package videoclub.pelicula;
+
+/**
+ * Clase que hereda de pelicula y le añade un atributo nivelFilosofia.
+ * 
+ * @author Elias Merabet
+ *
+ */
+
+public class Scifi extends Pelicula {
+
+	private int nivelFilosofia;
+
+	/**
+	 * Constructor que llama a la clase padre.
+	 * 
+	 * @param titulo
+	 *            titulo de la pelicula de Scifi.
+	 * @param duracion
+	 *            duracion de la pelicula de Scifi.
+	 * @param sinopsis
+	 *            sinopsis de la pelicula de Scifi.
+	 * @param nF
+	 *            nivel de filosofia de la pelicula de Scifi.
+	 */
+	public Scifi(String titulo, int duracion, String sinopsis, int nF) {
+		super(titulo, duracion, sinopsis);
+		this.nivelFilosofia = nF;
+	}
+
+	/**
+	 * Devuelve el atributo nivelFilosofia
+	 * 
+	 * @return nivelFilosofia nivel de filosofia del objeto.
+	 */
+	public int getNivelFilosofia() {
+		return nivelFilosofia;
+	}
+
+	/**
+	 * Fija el atributo nivelFilosofia
+	 * 
+	 * @param nF
+	 *            nivel de filosofia del objeto
+	 */
+	public void setNivelFilosofia(int nF) {
+		this.nivelFilosofia = nF;
+	}
+
+	/**
+	 * Devuelve el precio de la instancia.
+	 * 
+	 * @return precio del objeto.
+	 */
+	@Override
+	public float precio() {
+		return 3.80f;
+	}
+
+	/**
+	 * Devuelve la informacion del atributo nivelFilosofia en un String con el
+	 * formato que queriamos.
+	 * 
+	 * @return informacion del nivel de filosofia en el formato adecuado.
+	 */
+	public String intensidad() {
+		return this.nivelFilosofia + " de nivel de filosofia.";
+	}
+
+}
+
+CLASS SCARY.
+package videoclub.pelicula;
+
+/**
+ * Clase que hereda de pelicula y le añade un atributo nivelGritos.
+ * 
+ * @author Elias Merabet
+ *
+ */
+
+public class Terror extends Pelicula {
+	private int nivelGritos;
+
+	/**
+	 * Constructor que llama a la clase padre.
+	 * 
+	 * @param titulo
+	 *            titulo de la pelicula de terror.
+	 * @param duracion
+	 *            duracion de la pelicula de terror.
+	 * @param sinopsis
+	 *            sinopsis de la pelicula de terror.
+	 * @param nGritos
+	 *            nivel de gritos de la pelicula de terror.
+	 */
+	public Terror(String titulo, int duracion, String sinopsis, int nGritos) {
+		super(titulo, duracion, sinopsis);
+		this.nivelGritos = nGritos;
+	}
+
+	/**
+	 * Devuelve el atributo nivelGritos
+	 * 
+	 * @return nivelGritos nivel de gritos del objeto
+	 */
+	public int getNivelGritos() {
+		return nivelGritos;
+	}
+
+	/**
+	 * Fija el atributo nivelGritos
+	 * 
+	 * @param nivelGritos
+	 *            nivel de gritos del objeto.
+	 */
+	public void setNivelGritos(int nivelGritos) {
+		this.nivelGritos = nivelGritos;
+	}
+
+	/**
+	 * Devuelve el precio de la instancia.
+	 * 
+	 * @return precio del objeto.
+	 */
+	@Override
+	public float precio() {
+		return 3.50f;
+	}
+
+	/**
+	 * Devuelve la informacion del atributo nivelGritos en un String con el
+	 * formato que queriamos.
+	 * 
+	 * @return en formato del nivel de gritos del objeto.
+	 */
+	public String intensidad() {
+		return this.nivelGritos + " de nivel de gritos.";
+	}
+}
