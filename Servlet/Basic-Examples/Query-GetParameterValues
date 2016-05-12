@@ -1,0 +1,81 @@
+SERVLET.
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+/**
+ *
+ * @author alumno
+ */
+@WebServlet(urlPatterns = {"/Servlet1"})
+public class Servlet1 extends HttpServlet {
+
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        String nom = request.getParameter("txtNombre");
+        String ape1 = request.getParameter("txt1Apellido");
+        String ape2 = request.getParameter("txt2Apellido");
+        String dom = request.getParameter("txtDomicilio");
+        String ciud = request.getParameter("ciudad");
+        String sex = request.getParameter("sexo");
+        String so1 = "";
+        if (request.getParameterValues("SO") != null) {
+            String so[] = request.getParameterValues("SO");
+
+            for (int i = 0; i < so.length - 1; i++) {
+                so1 += so[i] + ", ";
+            }
+            //so1 = so1.substring(0, so1.length()-1). OTRA OPCION.
+            so1 += so[so.length - 1] + ".";
+        }
+        String com = request.getParameter("Comentarios");
+
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+
+        try {
+            DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
+            Connection conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "system", "javaoracle");
+            PreparedStatement ps = conn.prepareStatement("insert into cliente values(?,?,?,?,?,?,?,?)");
+            ps.setString(1, nom);
+            ps.setString(2, ape1);
+            ps.setString(3, ape2);
+            ps.setString(4, dom);
+            ps.setString(5, ciud);
+            ps.setString(6, sex);
+            ps.setString(7, so1);
+            ps.setString(8, com);
+            int af = ps.executeUpdate();
+            if (af > 0) {
+                out.println("<html>");
+                out.println("<head>");
+                out.println("<title>Respuesta Servlet</title>");
+                out.println("</head>");
+                out.println("<body bgcolor='white'>");
+                out.println("<header><center> SR. " + ape1 + " " + ape2 + " acaba de introducir sus datos en nuestra "
+                        + "Base de Datos</center></header>");
+                out.println("</html>");
+            } else {
+                out.println("<html>");
+                out.println("<head>");
+                out.println("<title>Respuesta Servlet</title>");
+                out.println("</head>");
+                out.println("<body bgcolor='white'>");
+                out.println("<header><center> PROBLEMAS AL INTRODUCIR EL REGISTRO </center></header>");
+                out.println("<header><center> VUELVA A LA PAGINA ANTERIOR <a href=\"index.html\"> Volver a Formulario</center></header>");
+                out.println("</html>");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Servlet1.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+}
