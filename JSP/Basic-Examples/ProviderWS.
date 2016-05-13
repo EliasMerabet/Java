@@ -1,0 +1,34 @@
+package Cambio;
+
+import javax.jws.WebService;
+import javax.jws.WebMethod;
+import javax.jws.WebParam;
+
+/**
+ *
+ * @author alumno
+ */
+@WebService(serviceName = "Monedas")
+public class Monedas {
+    public double[] valores = new double[] {1.26201, 14.4762, 75.6061, 135.861, 166.386};
+
+    
+    
+    /**
+     * Web service operation
+     */
+    @WebMethod(operationName = "Mae")
+    public double Mae(@WebParam(name = "cantidad") double cantidad, @WebParam(name = "tipomoneda") int tipomoneda) {
+        return (cantidad * valores[tipomoneda]);
+    }
+
+    /**
+     * Web service operation
+     */
+    @WebMethod(operationName = "EaM")
+    public double EaM(@WebParam(name = "cantidad") double cantidad, @WebParam(name = "tipomoneda") int tipomoneda) {
+        return (cantidad / valores[tipomoneda]);
+    }
+    
+    
+}
