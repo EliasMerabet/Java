@@ -1,0 +1,115 @@
+package WS5;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.jws.WebService;
+import javax.jws.WebMethod;
+import javax.jws.WebParam;
+
+/**
+ *
+ * @author alumno
+ */
+@WebService(serviceName = "PProductos")
+public class PProductos {
+
+    Connection cn;
+
+    public void conectar() {
+        try {
+            DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
+            cn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "system", "javaoracle");
+        } catch (SQLException ex) {
+            Logger.getLogger(PProductos.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
+    /**
+     * Web service operation
+     */
+    @WebMethod(operationName = "descripcion")
+    public String descripcion(@WebParam(name = "producto") String producto) {
+        ResultSet rs;
+        String descripcion = "";
+        try {
+            conectar();
+            PreparedStatement ps = cn.prepareStatement("select descripcion from productos where producto = ?");
+            ps.setString(1, producto);
+            rs = ps.executeQuery();
+
+            rs.next();
+            descripcion = rs.getString(1);
+        } catch (SQLException ex) {
+            Logger.getLogger(PProductos.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return descripcion;
+    }
+
+    /**
+     * Web service operation
+     */
+    @WebMethod(operationName = "precio")
+    public double precio(@WebParam(name = "producto") String producto) {
+        ResultSet rs;
+        double precio = 0.0;
+        try {
+            conectar();
+            PreparedStatement ps = cn.prepareStatement("select precio from productos where producto = ?");
+            ps.setString(1, producto);
+            rs = ps.executeQuery();
+
+            rs.next();
+            precio = rs.getDouble(1);
+        } catch (SQLException ex) {
+            Logger.getLogger(PProductos.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return precio;
+    }
+
+    /**
+     * Web service operation
+     */
+    @WebMethod(operationName = "stock")
+    public String stock() {
+        String stock = "";
+        try {
+            conectar();
+            Statement st = cn.createStatement();
+            ResultSet rs = st.executeQuery("select stock from productos");
+
+            while (rs.next()) {
+                stock += rs.getString(1) + ",";
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(PProductos.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return stock;
+    }
+
+    /**
+     * Web service operation
+     */
+    @WebMethod(operationName = "stockminimo")
+    public String stockminimo() {
+        String stockminimo = "";
+        try {
+            conectar();
+            Statement st = cn.createStatement();
+            ResultSet rs = st.executeQuery("select stock from productos");
+
+            while (rs.next()) {
+                stockminimo += rs.getString(1) + ",";
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(PProductos.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return stockminimo;
+    }
+}
