@@ -1,0 +1,72 @@
+<%@page import="java.sql.ResultSet"%>
+<%@page import="java.sql.Statement"%>
+<%@page import="java.sql.Connection"%>
+<%@page import="java.sql.DriverManager"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="sql" uri="http://java.sun.com/jsp/jstl/sql" %>
+<sql:setDataSource driver="oracle.jdbc.driver.OracleDriver" url="jdbc:oracle:thin:@localhost:1521:xe" user="system" password="javaoracle"/>
+
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>JSP Page</title>
+    </head>
+
+    <body>
+        <form action="index.jsp">
+            <%
+                Connection cn;
+                DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
+                cn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "system", "javaoracle");
+                Statement st;
+
+                
+
+                st = cn.createStatement();
+                ResultSet rs = st.executeQuery("select producto from productos");%>
+            <select name="producto">
+                <%
+                    while (rs.next()) {
+                %><option value="<%=rs.getString(1)%>"><%=rs.getString(1)%></option><%
+                    }
+                    
+                String producto = "";
+
+                if (request.getParameter("producto") != null) {
+                    producto = request.getParameter("producto");
+                }
+                %>
+            </select><br>
+            <input type="radio" name="opcion" value="descripcion">Descripcion<br>
+            <input type="radio" name="opcion" value="precio">Precio<br>
+            <input type="radio" name="opcion" value="stock">Stock<br>
+            <input type="radio" name="opcion" value="stockminimo">Stock Minimo<br><br>
+
+            <%
+                String opcion = "";
+
+                if (request.getParameter("opcion") != null) {
+                    opcion = request.getParameter("opcion");
+                }
+                if (opcion.equals("descripcion")) {
+                    String result = "";
+                    try {
+                        WS5C.PProductos_Service service = new WS5C.PProductos_Service();
+                        WS5C.PProductos port = service.getPProductosPort();
+                        // TODO initialize WS operation arguments here
+                        // TODO process result here
+                        result = port.descripcion(producto);
+                    } catch (Exception ex) {
+                        // TODO handle custom exceptions here
+                    }
+                %><h1><%=result%></h1><%} if (request.getParameter("opcion") == "precio"){
+                    
+                }%>
+                <input type="submit">
+        </form>
+    </body>
+
+</html>
