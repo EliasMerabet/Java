@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -6,18 +7,76 @@
         <title>JSP Page</title>
     </head>
     <body>
-    <%-- start web service invocation --%><hr/>
-    <%
-    try {
-	ClienteWSWebAPP.Proveedor_Service service = new ClienteWSWebAPP.Proveedor_Service();
-	ClienteWSWebAPP.Proveedor port = service.getProveedorPort();
-	// TODO process result here
-	java.lang.String result = port.nombre();
-	out.println(result);
-    } catch (Exception ex) {
-	// TODO handle custom exceptions here
-    }
-    %>
-    <%-- end web service invocation --%><hr/>
+        <%
+            String op;
+            int mon;
+            double can;   
+                    
+            if (request.getParameter("moneda") != null){
+            mon = Integer.parseInt(request.getParameter("moneda"));
+            } else{mon = 1;}
+
+            if (request.getParameter("op") != null){
+            op = request.getParameter("op");
+        }else {op = "MaE";}
+
+            if (request.getParameter("cantidad") != null){
+            can = Double.parseDouble(request.getParameter("cantidad"));
+            }else {can = 1.0;}
+        %>
+
+        <form action='index.jsp'><fieldset><br><select name='moneda'><option value='1'>Dolar</option><option value='2'>Pesos</option>
+        <option value='3'>Yenes</option><option value='4'>Rupias</option><option value='5'>Pesetas</option></select><br><br>
+        <input type='radio' name='op' value='MaE'>Moneda a Euro<input type='radio' name='op' value='EaM'>
+        Euro a Moneda<br><br>Cantidad:<br><input type='number' name='cantidad'><br><br>Resultado:<br><label>
+        <strong>CONVERTIR
+
+        <%
+        if (op.equals("MaE")){%>
+            <%=mon%> a Euros:<br>
+
+            <%-- start web service invocation --%><hr/>
+            <%
+            double result = 0.0;
+                try {
+                    WS3Monedas.Monedas_Service service = new WS3Monedas.Monedas_Service();
+                    WS3Monedas.Monedas port = service.getMonedasPort();
+                    // TODO initialize WS operation arguments here
+                    double cantidad = 0.0d;
+                    int tipomoneda = 0;
+                    // TODO process result here
+                    result = port.mae(can, mon);
+                    out.println("Result = " + result);
+                } catch (Exception ex) {
+                    // TODO handle custom exceptions here
+                }
+            %>
+            <%-- end web service invocation --%><hr/>
+            <%=result%>
+            <%} else{%>
+
+            Euros a <%=mon%>:<br>
+            <%-- start web service invocation --%><hr/>
+            <%
+            double result = 0.0;
+                try {
+                    WS3Monedas.Monedas_Service service = new WS3Monedas.Monedas_Service();
+                    WS3Monedas.Monedas port = service.getMonedasPort();
+                    // TODO initialize WS operation arguments here
+                    double cantidad = 0.0d;
+                    int tipomoneda = 0;
+                    // TODO process result here
+                    result = port.eaM(can, mon);
+                    out.println("Result = " + result);
+                } catch (Exception ex) {
+                    // TODO handle custom exceptions here
+                }
+            %>
+            <%-- end web service invocation --%><hr/>
+            <%=result%>
+            <%}%>
+
+        </strong></label><input type="submit"></fieldset></form>
+
     </body>
 </html>
