@@ -1,0 +1,232 @@
+-- REST --
+
+package com.example.kenzo.luckyhouse;
+
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.http.GET;
+
+/**
+ * Created by Kenzo on 24/05/2016.
+ */
+public interface RestApi {
+    @GET("devolverPisosA")
+    Call<List<pisoAlquiler>> devolverPisosA();
+
+    @GET("devolverPisosV")
+    Call<List<pisoVenta>> devolverPisosV();
+
+    @GET("devolverNoticias")
+    Call<List<noticia>> devolverNoticias();
+}
+
+-- POJO CLASS --
+
+package com.example.kenzo.luckyhouse;
+
+/**
+ * Created by Kenzo on 24/05/2016.
+ */
+public class pisoAlquiler {
+
+    private int codigo;
+
+    private String fotos;
+
+    private String zona;
+
+    private int mm;
+
+    private String descripcion;
+
+    private int precio;
+
+    private String estado;
+
+    public int getCodigo() {
+        return codigo;
+    }
+
+    public void setCodigo(int codigo) {
+        this.codigo = codigo;
+    }
+
+    public String getFotos() {
+        return fotos;
+    }
+
+    public void setFotos(String fotos) {
+        this.fotos = fotos;
+    }
+
+    public String getZona() {
+        return zona;
+    }
+
+    public void setZona(String zona) {
+        this.zona = zona;
+    }
+
+    public void setMm(int mm) {
+        this.mm = mm;
+    }
+
+    public int getMn() {
+        return mm;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public int getPrecio() {
+        return precio;
+    }
+
+    public void setPrecio(int precio) {
+        this.precio = precio;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
+    @Override
+    public String toString()
+    {
+        return String.valueOf(this.codigo);
+    }
+}
+
+-- ACTIVITY --
+
+package com.example.kenzo.luckyhouse;
+
+import android.content.Intent;
+import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
+public class Alquiler extends AppCompatActivity implements Callback<List<pisoAlquiler>> {
+
+    private ListView lv;
+    ArrayList<pisoAlquiler> responsePisosAlquiler = new ArrayList<pisoAlquiler>();
+    public static final String BASE_URL = "http://192.168.0.156:52896/Service1.svc/";
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_alquiler);
+
+        // Find the ScrollView
+        lv = (ListView) findViewById(R.id.listView);
+
+        // CREATE CLIENT SERVICE
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        // prepare call in Retrofit 2.0
+        RestApi restApi = retrofit.create(RestApi.class);
+
+        Call<List<pisoAlquiler>> call = restApi.devolverPisosA();
+        //asynchronous call
+        call.enqueue(this);
+
+    }
+
+    // Initiating Menu XML file (menu.xml)
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    /**
+     * Event Handling for Individual menu item selected
+     * Identify single menu item by it's id
+     * */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case R.id.menu_home:
+                Intent i = new Intent(this, Home.class);
+                startActivity(i);
+                return true;
+
+            case R.id.menu_alquiler:
+                Toast.makeText(Alquiler.this, "Te encuentras en Alquiler", Toast.LENGTH_SHORT).show();
+                return true;
+
+            case R.id.menu_venta:
+                Intent ii = new Intent(this, Venta.class);
+                startActivity(ii);
+                return true;
+
+            case R.id.menu_nosotros:
+                Intent iii = new Intent(this, Nosotros.class);
+                startActivity(iii);
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onResponse(Call<List<pisoAlquiler>> call, Response<List<pisoAlquiler>> response) {
+        setProgressBarIndeterminateVisibility(false);
+
+        /*pisosAlquiler responsePisosAlquiler = new pisosAlquiler();
+        responsePisosAlquiler.setPisoAlquilerList((List<pisoAlquiler>) response.body());
+
+        for (pisoAlquiler piso : responsePisosAlquiler.getPisoAlquilerList()){
+            pisos
+        }*/
+
+        responsePisosAlquiler = (ArrayList<pisoAlquiler>) response.body();
+
+        ArrayAdapter<pisoAlquiler> pisos = new ArrayAdapter<pisoAlquiler>(this, android.R.layout.simple_list_item_1,responsePisosAlquiler);
+        this.lv.setAdapter(pisos);
+    }
+
+    @Override
+    public void onFailure(Call<List<pisoAlquiler>> call, Throwable t) {
+        Toast.makeText(Alquiler.this, t.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+    }
+
+}
