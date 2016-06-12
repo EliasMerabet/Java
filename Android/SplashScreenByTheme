@@ -1,0 +1,52 @@
+-- DRAWABLE --
+
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:drawable="@color/common_action_bar_splitter"/>
+
+    <item>
+        <bitmap
+            android:gravity="center"
+            android:src="@mipmap/logo"/>
+    </item>
+
+</layer-list>
+
+-- STYLE --
+
+<style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowBackground">@drawable/background_splash</item>
+</style>
+
+-- ANDROIDMANIFEST --
+
+        <activity
+            android:name=".SplashActivity"
+            android:theme="@style/SplashTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        
+-- ACTIVITY --
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+
+/**
+ * Created by Kenzo on 12/06/2016.
+ */
+public class SplashActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        Intent intent = new Intent(this, Home.class);
+        startActivity(intent);
+        finish();
+    }
+}
