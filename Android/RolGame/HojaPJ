@@ -1,0 +1,112 @@
+import android.app.Activity;
+import android.content.Intent;
+import android.media.MediaPlayer;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Toast;
+
+public class hojapj extends Activity {
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_hojapj);
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.menu_principal, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case R.id.menu_home:
+                // Single menu item is selected do something
+                // Ex: launching new activity/screen or show alert message
+                Intent iiii = new Intent(this, MainActivity.class);
+                startActivity(iiii);
+                return true;
+
+            case R.id.menu_dado:
+                Intent i = new Intent(this, dados.class);
+                startActivity(i);
+                return true;
+
+            case R.id.menu_hojapj:
+                Toast.makeText(hojapj.this, "Estas en la Hoja PJ", Toast.LENGTH_SHORT).show();
+                return true;
+
+            case R.id.menu_reglas:
+                Intent ii = new Intent(this, Reglas.class);
+                startActivity(ii);
+                return true;
+
+            case R.id.menu_mapa:
+                Intent iii = new Intent(this, map.class);
+                startActivity(iii);
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+
+    public void datos(View view) {
+        Intent i = new Intent(this, datospj.class );
+        startActivity(i);
+    }
+
+    public void atributos(View view) {
+        Intent i = new Intent(this, atributospj.class );
+        startActivity(i);
+    }
+
+    public void talentos(View view) {
+        Intent i = new Intent(this, talentospj.class );
+        startActivity(i);
+    }
+
+    public void tecnicas(View view) {
+        Intent i = new Intent(this, tecnicaspj.class );
+        startActivity(i);
+    }
+
+    public void conocimientos(View view) {
+        Intent i = new Intent(this, conocimientospj.class );
+        startActivity(i);
+    }
+
+    public void disciplinas(View view) {
+        Intent i = new Intent(this, disciplinaspj.class );
+        startActivity(i);
+    }
+
+    public void transfondos(View view) {
+        Intent i = new Intent(this, transfondopj.class );
+        startActivity(i);
+    }
+
+    public void virtudes(View view) {
+        Intent i = new Intent(this, virtudespj.class );
+        startActivity(i);
+    }
+
+    public void estadisticas(View view) {
+        Intent i = new Intent(this, estadisticaspj.class );
+        startActivity(i);
+    }
+
+
+}
