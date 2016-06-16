@@ -1,0 +1,66 @@
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.EditText;
+
+
+public class Socio extends Activity
+{
+
+    private EditText nombre;
+    private EditText apellido;
+    private EditText dni;
+    private EditText direccion;
+    private EditText edad;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_Socio);
+
+        nombre = (EditText) findViewById(R.id.nombre);
+        apellido = (EditText) findViewById(R.id.apellido);
+        dni = (EditText) findViewById(R.id.dni);
+        direccion = (EditText) findViewById(R.id.direccion);
+        edad = (EditText) findViewById(R.id.edad);
+
+        cargar();
+    }
+
+    public void cargar()
+    {
+        // NOMBRE DE ARCHIVO XML Y ACCESO PRIVADO, SOLO PARA ESTA APP.
+        SharedPreferences prefC = getSharedPreferences("Socio", Context.MODE_PRIVATE);
+        // SACAR VALOR CONDUCTA Y EN CASO DE NULO VALOR POR DEFECTO ES NULO.
+        nombre.setText(prefC.getString("nombre",""));
+        apellido.setText(prefC.getString("apellido",""));
+        dni.setText(prefC.getString("dni",""));
+        direccion.setText(prefC.getString("direccion",""));
+        edad.setText(prefC.getString("edad",""));
+
+    }
+
+    public void guardar(View view)
+    {
+        // ABRIR SHARED EN MODO EDITOR.
+        SharedPreferences pref = getSharedPreferences("Socio", Context.MODE_PRIVATE);
+        SharedPreferences.Editor edit = pref.edit();
+        String nombre = nombre.getText().toString();
+        String apellido = apellido.getText().toString();
+        String dni = dni.getText().toString();
+        String direccion = direccion.getText().toString();
+        String edad = edad.getText().toString();
+        // SOBREESCRIBIR VALOR CONDUCTA CON STRING CONDUCTA.
+        edit.putString("nombre", nombre);
+        edit.putString("apellido", apellido);
+        edit.putString("dni", dni);
+        edit.putString("direccion", direccion);
+        edit.putString("edad", edad);
+        edit.commit();
+        finish();
+    }
+
+}
